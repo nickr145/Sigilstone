@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		13AD630B01C64ECD2955CC7E /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E9BDBCF96CABC50FA7F37E6 /* AnalyticsService.swift */; };
 		1F70211B2240A2FF1030E4CA /* AnalyticsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7083FB78E45630A62CDF352B /* AnalyticsServiceTests.swift */; };
-		AAAA00000000000000000001 /* AudioPlayerManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000002 /* AudioPlayerManagerTests.swift */; };
 		54606C99366B10879D8EA422 /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7610716BE3A33919B58F1E74 /* PersistenceManager.swift */; };
 		5B2089AD2C9E69D80064028E /* SigilstoneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089AC2C9E69D80064028E /* SigilstoneApp.swift */; };
 		5B2089B42C9E69D90064028E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B2089B32C9E69D90064028E /* Preview Assets.xcassets */; };
@@ -28,10 +27,12 @@
 		5B2089E62CBCD92D0064028E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5B2089E52CBCD92D0064028E /* LaunchScreen.storyboard */; };
 		5B2089E82CC0BBDB0064028E /* DifficultySelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089E72CC0BBDB0064028E /* DifficultySelectionView.swift */; };
 		5B2089EA2CC446D80064028E /* AudioPlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089E92CC446D80064028E /* AudioPlayerManager.swift */; };
+		5B5A1E6530953373007D2F91 /* RulesCharacterizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A1E6430953373007D2F91 /* RulesCharacterizationTests.swift */; };
 		5B87817E2CEB19E1001B041B /* GameStringConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B87817D2CEB19E1001B041B /* GameStringConstants.swift */; };
 		5B8781802CEB1A28001B041B /* PlayerPiecesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B87817F2CEB1A28001B041B /* PlayerPiecesModel.swift */; };
 		6F9CDF8A601B4153FA4497BA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49595B86EEC2D0F7DB6C67E8 /* Foundation.framework */; };
 		8C894EC9F874482ACC5AFFD8 /* GameViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228422B18A73CBA378674E6E /* GameViewModelTests.swift */; };
+		AAAA00000000000000000001 /* AudioPlayerManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000002 /* AudioPlayerManagerTests.swift */; };
 		F86E07674771088A442DA2E7 /* PersistenceManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 219AB44691406C075E66CE15 /* PersistenceManagerTests.swift */; };
 		FECC32337A577899BE5EC66B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 57A61175DBC8784D7206D5E7 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
@@ -51,7 +52,7 @@
 		228422B18A73CBA378674E6E /* GameViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameViewModelTests.swift; sourceTree = "<group>"; };
 		2CAA85154CDE8CB7701F7F69 /* SigilstoneTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SigilstoneTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		49595B86EEC2D0F7DB6C67E8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		57A61175DBC8784D7206D5E7 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		57A61175DBC8784D7206D5E7 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		5B2089A92C9E69D80064028E /* Sigilstone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sigilstone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B2089AC2C9E69D80064028E /* SigilstoneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigilstoneApp.swift; sourceTree = "<group>"; };
 		5B2089B02C9E69D90064028E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -71,12 +72,13 @@
 		5B2089E52CBCD92D0064028E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5B2089E72CC0BBDB0064028E /* DifficultySelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultySelectionView.swift; sourceTree = "<group>"; };
 		5B2089E92CC446D80064028E /* AudioPlayerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerManager.swift; sourceTree = "<group>"; };
+		5B5A1E6430953373007D2F91 /* RulesCharacterizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesCharacterizationTests.swift; sourceTree = "<group>"; };
 		5B87817D2CEB19E1001B041B /* GameStringConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStringConstants.swift; sourceTree = "<group>"; };
 		5B87817F2CEB1A28001B041B /* PlayerPiecesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerPiecesModel.swift; sourceTree = "<group>"; };
 		7083FB78E45630A62CDF352B /* AnalyticsServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnalyticsServiceTests.swift; sourceTree = "<group>"; };
-		AAAA00000000000000000002 /* AudioPlayerManagerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AudioPlayerManagerTests.swift; sourceTree = "<group>"; };
 		7610716BE3A33919B58F1E74 /* PersistenceManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PersistenceManager.swift; sourceTree = "<group>"; };
 		7E9BDBCF96CABC50FA7F37E6 /* AnalyticsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		AAAA00000000000000000002 /* AudioPlayerManagerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AudioPlayerManagerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -193,8 +195,8 @@
 				219AB44691406C075E66CE15 /* PersistenceManagerTests.swift */,
 				7083FB78E45630A62CDF352B /* AnalyticsServiceTests.swift */,
 				AAAA00000000000000000002 /* AudioPlayerManagerTests.swift */,
+				5B5A1E6430953373007D2F91 /* RulesCharacterizationTests.swift */,
 			);
-			name = SigilstoneTests;
 			path = SigilstoneTests;
 			sourceTree = "<group>";
 		};
@@ -212,7 +214,6 @@
 				7610716BE3A33919B58F1E74 /* PersistenceManager.swift */,
 				7E9BDBCF96CABC50FA7F37E6 /* AnalyticsService.swift */,
 			);
-			name = Services;
 			path = Services;
 			sourceTree = "<group>";
 		};
@@ -342,6 +343,7 @@
 				8C894EC9F874482ACC5AFFD8 /* GameViewModelTests.swift in Sources */,
 				F86E07674771088A442DA2E7 /* PersistenceManagerTests.swift in Sources */,
 				1F70211B2240A2FF1030E4CA /* AnalyticsServiceTests.swift in Sources */,
+				5B5A1E6530953373007D2F91 /* RulesCharacterizationTests.swift in Sources */,
 				AAAA00000000000000000001 /* AudioPlayerManagerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
