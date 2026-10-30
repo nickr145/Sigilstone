@@ -1,0 +1,600 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		13AD630B01C64ECD2955CC7E /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E9BDBCF96CABC50FA7F37E6 /* AnalyticsService.swift */; };
+		1F70211B2240A2FF1030E4CA /* AnalyticsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7083FB78E45630A62CDF352B /* AnalyticsServiceTests.swift */; };
+		AAAA00000000000000000001 /* AudioPlayerManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000002 /* AudioPlayerManagerTests.swift */; };
+		54606C99366B10879D8EA422 /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7610716BE3A33919B58F1E74 /* PersistenceManager.swift */; };
+		5B2089AD2C9E69D80064028E /* SigilstoneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089AC2C9E69D80064028E /* SigilstoneApp.swift */; };
+		5B2089B42C9E69D90064028E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B2089B32C9E69D90064028E /* Preview Assets.xcassets */; };
+		5B2089BB2C9E6B2D0064028E /* GameBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089BA2C9E6B2D0064028E /* GameBoardView.swift */; };
+		5B2089BD2C9E6D210064028E /* StoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089BC2C9E6D210064028E /* StoneView.swift */; };
+		5B2089BF2C9E71CA0064028E /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089BE2C9E71CA0064028E /* GameViewModel.swift */; };
+		5B2089C12C9E74E00064028E /* EmptyCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089C02C9E74E00064028E /* EmptyCellView.swift */; };
+		5B2089C52C9F5EC80064028E /* GameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089C42C9F5EC80064028E /* GameModel.swift */; };
+		5B2089CA2C9FDFCB0064028E /* GIFView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089C92C9FDFCA0064028E /* GIFView.swift */; };
+		5B2089CB2C9FE0930064028E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B2089B02C9E69D90064028E /* Assets.xcassets */; };
+		5B2089D12CA0F4310064028E /* TitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089D02CA0F4310064028E /* TitleView.swift */; };
+		5B2089D32CA11A3B0064028E /* PVPView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089D22CA11A3B0064028E /* PVPView.swift */; };
+		5B2089D52CA24AB20064028E /* PVCView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089D42CA24AB20064028E /* PVCView.swift */; };
+		5B2089DF2CA8FA380064028E /* PieceSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089DE2CA8FA380064028E /* PieceSelectionView.swift */; };
+		5B2089E32CBB770B0064028E /* InstructionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089E22CBB770B0064028E /* InstructionsView.swift */; };
+		5B2089E62CBCD92D0064028E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5B2089E52CBCD92D0064028E /* LaunchScreen.storyboard */; };
+		5B2089E82CC0BBDB0064028E /* DifficultySelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089E72CC0BBDB0064028E /* DifficultySelectionView.swift */; };
+		5B2089EA2CC446D80064028E /* AudioPlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2089E92CC446D80064028E /* AudioPlayerManager.swift */; };
+		5B87817E2CEB19E1001B041B /* GameStringConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B87817D2CEB19E1001B041B /* GameStringConstants.swift */; };
+		5B8781802CEB1A28001B041B /* PlayerPiecesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B87817F2CEB1A28001B041B /* PlayerPiecesModel.swift */; };
+		6F9CDF8A601B4153FA4497BA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49595B86EEC2D0F7DB6C67E8 /* Foundation.framework */; };
+		8C894EC9F874482ACC5AFFD8 /* GameViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228422B18A73CBA378674E6E /* GameViewModelTests.swift */; };
+		F86E07674771088A442DA2E7 /* PersistenceManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 219AB44691406C075E66CE15 /* PersistenceManagerTests.swift */; };
+		FECC32337A577899BE5EC66B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 57A61175DBC8784D7206D5E7 /* PrivacyInfo.xcprivacy */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9EB710B741E8C6ED4AE6E41D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5B2089A12C9E69D80064028E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5B2089A82C9E69D80064028E;
+			remoteInfo = Sigilstone;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		219AB44691406C075E66CE15 /* PersistenceManagerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PersistenceManagerTests.swift; sourceTree = "<group>"; };
+		228422B18A73CBA378674E6E /* GameViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameViewModelTests.swift; sourceTree = "<group>"; };
+		2CAA85154CDE8CB7701F7F69 /* SigilstoneTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SigilstoneTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		49595B86EEC2D0F7DB6C67E8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		57A61175DBC8784D7206D5E7 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		5B2089A92C9E69D80064028E /* Sigilstone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sigilstone.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B2089AC2C9E69D80064028E /* SigilstoneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigilstoneApp.swift; sourceTree = "<group>"; };
+		5B2089B02C9E69D90064028E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5B2089B32C9E69D90064028E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		5B2089BA2C9E6B2D0064028E /* GameBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameBoardView.swift; sourceTree = "<group>"; };
+		5B2089BC2C9E6D210064028E /* StoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoneView.swift; sourceTree = "<group>"; };
+		5B2089BE2C9E71CA0064028E /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
+		5B2089C02C9E74E00064028E /* EmptyCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyCellView.swift; sourceTree = "<group>"; };
+		5B2089C42C9F5EC80064028E /* GameModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameModel.swift; sourceTree = "<group>"; };
+		5B2089C92C9FDFCA0064028E /* GIFView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFView.swift; sourceTree = "<group>"; };
+		5B2089D02CA0F4310064028E /* TitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleView.swift; sourceTree = "<group>"; };
+		5B2089D22CA11A3B0064028E /* PVPView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PVPView.swift; sourceTree = "<group>"; };
+		5B2089D42CA24AB20064028E /* PVCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PVCView.swift; sourceTree = "<group>"; };
+		5B2089DE2CA8FA380064028E /* PieceSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieceSelectionView.swift; sourceTree = "<group>"; };
+		5B2089E22CBB770B0064028E /* InstructionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsView.swift; sourceTree = "<group>"; };
+		5B2089E42CBCD8D90064028E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		5B2089E52CBCD92D0064028E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		5B2089E72CC0BBDB0064028E /* DifficultySelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultySelectionView.swift; sourceTree = "<group>"; };
+		5B2089E92CC446D80064028E /* AudioPlayerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerManager.swift; sourceTree = "<group>"; };
+		5B87817D2CEB19E1001B041B /* GameStringConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStringConstants.swift; sourceTree = "<group>"; };
+		5B87817F2CEB1A28001B041B /* PlayerPiecesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerPiecesModel.swift; sourceTree = "<group>"; };
+		7083FB78E45630A62CDF352B /* AnalyticsServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnalyticsServiceTests.swift; sourceTree = "<group>"; };
+		AAAA00000000000000000002 /* AudioPlayerManagerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AudioPlayerManagerTests.swift; sourceTree = "<group>"; };
+		7610716BE3A33919B58F1E74 /* PersistenceManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PersistenceManager.swift; sourceTree = "<group>"; };
+		7E9BDBCF96CABC50FA7F37E6 /* AnalyticsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5B2089A62C9E69D80064028E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B4B2B98730E0ED085A76F273 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6F9CDF8A601B4153FA4497BA /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1B706906910775FB0FD269A7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				97F73A916F4B269501BF3EB1 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		5B2089A02C9E69D80064028E = {
+			isa = PBXGroup;
+			children = (
+				5B2089AB2C9E69D80064028E /* Sigilstone */,
+				5B2089AA2C9E69D80064028E /* Products */,
+				1B706906910775FB0FD269A7 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		5B2089AA2C9E69D80064028E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5B2089A92C9E69D80064028E /* Sigilstone.app */,
+				2CAA85154CDE8CB7701F7F69 /* SigilstoneTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5B2089AB2C9E69D80064028E /* Sigilstone */ = {
+			isa = PBXGroup;
+			children = (
+				5B2089E42CBCD8D90064028E /* Info.plist */,
+				5B2089AC2C9E69D80064028E /* SigilstoneApp.swift */,
+				5B2089C82C9F7E4C0064028E /* ViewModels */,
+				5B2089C72C9F7E440064028E /* Models */,
+				5B2089C62C9F7E3C0064028E /* Views */,
+				5B2089B02C9E69D90064028E /* Assets.xcassets */,
+				5B2089B22C9E69D90064028E /* Preview Content */,
+				5B2089E52CBCD92D0064028E /* LaunchScreen.storyboard */,
+				7C6C96A56F7BD0BAFF786C08 /* SigilstoneTests */,
+				E926CC9C8363EDF5E14F0925 /* Services */,
+				57A61175DBC8784D7206D5E7 /* PrivacyInfo.xcprivacy */,
+			);
+			path = Sigilstone;
+			sourceTree = "<group>";
+		};
+		5B2089B22C9E69D90064028E /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				5B2089B32C9E69D90064028E /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		5B2089C62C9F7E3C0064028E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				5B2089D22CA11A3B0064028E /* PVPView.swift */,
+				5B2089C02C9E74E00064028E /* EmptyCellView.swift */,
+				5B2089BC2C9E6D210064028E /* StoneView.swift */,
+				5B2089BA2C9E6B2D0064028E /* GameBoardView.swift */,
+				5B2089C92C9FDFCA0064028E /* GIFView.swift */,
+				5B2089D02CA0F4310064028E /* TitleView.swift */,
+				5B2089D42CA24AB20064028E /* PVCView.swift */,
+				5B2089DE2CA8FA380064028E /* PieceSelectionView.swift */,
+				5B2089E22CBB770B0064028E /* InstructionsView.swift */,
+				5B2089E72CC0BBDB0064028E /* DifficultySelectionView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		5B2089C72C9F7E440064028E /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				5B2089C42C9F5EC80064028E /* GameModel.swift */,
+				5B87817D2CEB19E1001B041B /* GameStringConstants.swift */,
+				5B87817F2CEB1A28001B041B /* PlayerPiecesModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5B2089C82C9F7E4C0064028E /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				5B2089BE2C9E71CA0064028E /* GameViewModel.swift */,
+				5B2089E92CC446D80064028E /* AudioPlayerManager.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		7C6C96A56F7BD0BAFF786C08 /* SigilstoneTests */ = {
+			isa = PBXGroup;
+			children = (
+				228422B18A73CBA378674E6E /* GameViewModelTests.swift */,
+				219AB44691406C075E66CE15 /* PersistenceManagerTests.swift */,
+				7083FB78E45630A62CDF352B /* AnalyticsServiceTests.swift */,
+				AAAA00000000000000000002 /* AudioPlayerManagerTests.swift */,
+			);
+			name = SigilstoneTests;
+			path = SigilstoneTests;
+			sourceTree = "<group>";
+		};
+		97F73A916F4B269501BF3EB1 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				49595B86EEC2D0F7DB6C67E8 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		E926CC9C8363EDF5E14F0925 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				7610716BE3A33919B58F1E74 /* PersistenceManager.swift */,
+				7E9BDBCF96CABC50FA7F37E6 /* AnalyticsService.swift */,
+			);
+			name = Services;
+			path = Services;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5B2089A82C9E69D80064028E /* Sigilstone */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5B2089B72C9E69D90064028E /* Build configuration list for PBXNativeTarget "Sigilstone" */;
+			buildPhases = (
+				5B2089A52C9E69D80064028E /* Sources */,
+				5B2089A62C9E69D80064028E /* Frameworks */,
+				5B2089A72C9E69D80064028E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Sigilstone;
+			productName = Sigilstone;
+			productReference = 5B2089A92C9E69D80064028E /* Sigilstone.app */;
+			productType = "com.apple.product-type.application";
+		};
+		6A29C317C3D5251A04273740 /* SigilstoneTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ECF17AE29E4B3050F9F89A55 /* Build configuration list for PBXNativeTarget "SigilstoneTests" */;
+			buildPhases = (
+				5B5B8E4A2C4379B103E83653 /* Sources */,
+				B4B2B98730E0ED085A76F273 /* Frameworks */,
+				0166D94E0CC96AF4140A35C4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3C821D1562081ED45BB640FC /* PBXTargetDependency */,
+			);
+			name = SigilstoneTests;
+			productName = SigilstoneTests;
+			productReference = 2CAA85154CDE8CB7701F7F69 /* SigilstoneTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5B2089A12C9E69D80064028E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					5B2089A82C9E69D80064028E = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = 5B2089A42C9E69D80064028E /* Build configuration list for PBXProject "Sigilstone" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5B2089A02C9E69D80064028E;
+			productRefGroup = 5B2089AA2C9E69D80064028E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5B2089A82C9E69D80064028E /* Sigilstone */,
+				6A29C317C3D5251A04273740 /* SigilstoneTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0166D94E0CC96AF4140A35C4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5B2089A72C9E69D80064028E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B2089CB2C9FE0930064028E /* Assets.xcassets in Resources */,
+				5B2089E62CBCD92D0064028E /* LaunchScreen.storyboard in Resources */,
+				5B2089B42C9E69D90064028E /* Preview Assets.xcassets in Resources */,
+				FECC32337A577899BE5EC66B /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5B2089A52C9E69D80064028E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B2089BF2C9E71CA0064028E /* GameViewModel.swift in Sources */,
+				5B2089E82CC0BBDB0064028E /* DifficultySelectionView.swift in Sources */,
+				5B2089E32CBB770B0064028E /* InstructionsView.swift in Sources */,
+				5B2089CA2C9FDFCB0064028E /* GIFView.swift in Sources */,
+				5B2089D32CA11A3B0064028E /* PVPView.swift in Sources */,
+				5B2089EA2CC446D80064028E /* AudioPlayerManager.swift in Sources */,
+				5B2089C12C9E74E00064028E /* EmptyCellView.swift in Sources */,
+				5B2089BD2C9E6D210064028E /* StoneView.swift in Sources */,
+				5B2089DF2CA8FA380064028E /* PieceSelectionView.swift in Sources */,
+				5B8781802CEB1A28001B041B /* PlayerPiecesModel.swift in Sources */,
+				5B2089D12CA0F4310064028E /* TitleView.swift in Sources */,
+				5B2089D52CA24AB20064028E /* PVCView.swift in Sources */,
+				5B2089AD2C9E69D80064028E /* SigilstoneApp.swift in Sources */,
+				5B2089C52C9F5EC80064028E /* GameModel.swift in Sources */,
+				5B2089BB2C9E6B2D0064028E /* GameBoardView.swift in Sources */,
+				5B87817E2CEB19E1001B041B /* GameStringConstants.swift in Sources */,
+				54606C99366B10879D8EA422 /* PersistenceManager.swift in Sources */,
+				13AD630B01C64ECD2955CC7E /* AnalyticsService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5B5B8E4A2C4379B103E83653 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8C894EC9F874482ACC5AFFD8 /* GameViewModelTests.swift in Sources */,
+				F86E07674771088A442DA2E7 /* PersistenceManagerTests.swift in Sources */,
+				1F70211B2240A2FF1030E4CA /* AnalyticsServiceTests.swift in Sources */,
+				AAAA00000000000000000001 /* AudioPlayerManagerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3C821D1562081ED45BB640FC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Sigilstone;
+			target = 5B2089A82C9E69D80064028E /* Sigilstone */;
+			targetProxy = 9EB710B741E8C6ED4AE6E41D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		3C278AFBCCFC234DC5895081 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = nr.SigilstoneTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Sigilstone.app/Sigilstone";
+			};
+			name = Debug;
+		};
+		5B2089B52C9E69D90064028E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		5B2089B62C9E69D90064028E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		5B2089B82C9E69D90064028E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Sigilstone/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sigilstone/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nr.sigilstone;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5B2089B92C9E69D90064028E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Sigilstone/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sigilstone/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nr.sigilstone;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		908D572A9607F4A8094C681D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = nr.SigilstoneTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Sigilstone.app/Sigilstone";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5B2089A42C9E69D80064028E /* Build configuration list for PBXProject "Sigilstone" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5B2089B52C9E69D90064028E /* Debug */,
+				5B2089B62C9E69D90064028E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5B2089B72C9E69D90064028E /* Build configuration list for PBXNativeTarget "Sigilstone" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5B2089B82C9E69D90064028E /* Debug */,
+				5B2089B92C9E69D90064028E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ECF17AE29E4B3050F9F89A55 /* Build configuration list for PBXNativeTarget "SigilstoneTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				908D572A9607F4A8094C681D /* Release */,
+				3C278AFBCCFC234DC5895081 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5B2089A12C9E69D80064028E /* Project object */;
+}
