@@ -29,6 +29,13 @@ struct GameState: Equatable {
         self.currentPlayer = startingPlayer
     }
     
+    init(board: [Stone?], player1Hand: [Stone], player2Hand: [Stone], currentPlayer: Int) {
+        self.board = board
+        self.player1Hand = player1Hand
+        self.player2Hand = player2Hand
+        self.currentPlayer = currentPlayer
+    }
+    
     var emptyCells: [Int] {
         board.indices.filter { board[$0] == nil }
     }
