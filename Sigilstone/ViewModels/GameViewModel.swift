@@ -14,19 +14,54 @@ class GameViewModel: ObservableObject {
     @Published var musicDifficultyStrings = GameStringConstants.musicDifficultyStrings
     @Published var piecesModel = PlayerPiecesModel()
     
-    @Published var board: [Stone?] = Array(repeating: nil, count: 9)
-    @Published var player1Pieces: [Stone]
-    @Published var player2Pieces: [Stone]
+//    @Published var board: [Stone?] = Array(repeating: nil, count: 9)
+//    @Published var player1Pieces: [Stone]
+//    @Published var player2Pieces: [Stone]
+//    @Published var selectedPiece: Stone?
+//    @Published var currentPlayer: Int
+//    @Published var isGameOver: Bool = false
+//    @Published var winner: Int?
+//    @Published var player1Score: Int = 0
+//    @Published var player2Score: Int = 0
+//    @Published var isAITurnPending: Bool = false
+    
+    // The whole game as one value. The engine reads and replaces it; everything else
+    // in this class is UI state or side effects.
+    @Published private(set) var gameState: GameState
     @Published var selectedPiece: Stone?
-    @Published var currentPlayer: Int
     @Published var isGameOver: Bool = false
     @Published var winner: Int?
-    @Published var player1Score: Int = 0
-    @Published var player2Score: Int = 0
     @Published var isAITurnPending: Bool = false
+    
+    // Bumped every time the computer becomes due to move. Views watch this instead of
+    // guessing from currentPlayer, which doesn't change when the computer makes the
+    // last move of one game and the first move of the next.
+    @Published private(set) var computerTurnToken = 0
+    
+    // Forwarders so views an dtests keep using the same names.
+    var board: [Stone?] {
+        get { gameState.board }
+        set { gameState.board = newValue }
+    }
+    var player1Pieces: [Stone] {
+        get { gameState.player1Hand }
+        set { gameState.player1Hand = newValue }
+    }
+    var player2Pieces: [Stone] {
+        get { gameState.player2Hand }
+        set { gameState.player2Hand = newValue }
+    }
+    var currentPlayer: Int {
+        get { gameState.currentPlayer }
+        set { gameState.currentPlayer = newValue }
+    }
+    var player1Score: Int { gameState.score(for: 1) }
+    var player2Score: Int { gameState.score(for: 2) }
 
     /// Single source of truth for who moves first, shared by init and resetGame() so the two can never drift out of sync again.
     private let startingPlayer = 2
+    private let computerPlayer = 2
+    private var isPlayingComputer = false
 
     private var level1Pieces: [Stone]
     private var level2Pieces: [Stone]
@@ -42,8 +77,7 @@ class GameViewModel: ObservableObject {
 
     init(persistence: PersistenceStore = UserDefaultsPersistenceStore(), analytics: AnalyticsService = ConsoleAnalyticsService()) {
         let piecesModel = PlayerPiecesModel()
-        self.player1Pieces = piecesModel.player1Pieces
-        self.player2Pieces = piecesModel.player2Pieces
+        self.gameState = GameState(player1Hand: piecesModel.player1Pieces, player2Hand: piecesModel.player2Pieces, startingPlayer: startingPlayer)
         self.level1Pieces = piecesModel.level1Pieces
         self.level2Pieces = piecesModel.level2Pieces
         self.level3Pieces = piecesModel.level3Pieces
@@ -51,32 +85,11 @@ class GameViewModel: ObservableObject {
         self.level5Pieces = piecesModel.level5Pieces
         self.level6Pieces = piecesModel.level6Pieces
         self.player1PiecesForEachDifficulty = piecesModel.player1PiecesForEachDifficulty
-        self.currentPlayer = startingPlayer
         self.persistence = persistence
         self.analytics = analytics
     }
     
     var selectedDifficulty: Int = 1
-    
-    /// Bridge to the engine until GameState becomes the stored property (step 7):
-    /// reads the published fields into a GameState, and writes a new one back.
-    private var gameState: GameState {
-        get {
-            GameState(board: board, player1Hand: player1Pieces, player2Hand: player2Pieces, currentPlayer: currentPlayer)
-        }
-        set {
-            board = newValue.board
-            player1Pieces = newValue.player1Hand
-            player2Pieces = newValue.player2Hand
-            currentPlayer = newValue.currentPlayer
-        }
-    }
-    
-    
-    func updateScores() {
-        player1Score = Scoring.score(for: 1, on: board)
-        player2Score = Scoring.score(for: 2, on: board)
-    }
     
     /// Difficulty is always 1-6 in practice (the picker that drives it only offers
     /// those values), but Int isn't exhaustively switchable, so `default` falls
@@ -97,6 +110,8 @@ class GameViewModel: ObservableObject {
         selectedDifficulty = level
         analytics.track(event: "game_started", properties: ["mode": "pvc", "difficulty": level])
         (player2Pieces, player1Pieces) = pieces(forDifficulty: level)
+        isPlayingComputer = true
+        requestComputerMoveIfDue()
     }
     
     func recordDifficultySelection(_ level: Int) {
@@ -106,7 +121,7 @@ class GameViewModel: ObservableObject {
     
     /// Asks the strategy for the current difficulty for a move, then plays it.
     func performComputerMove() {
-        guard currentPlayer == 2 else { return }
+        guard currentPlayer == computerPlayer else { return }
         var generator = SystemRandomNumberGenerator()
         let strategy = AIStrategies.strategy(forlevel: selectedDifficulty)
         guard let move = strategy.chooseMove(in: gameState, using: &generator) else { return }
@@ -132,9 +147,9 @@ class GameViewModel: ObservableObject {
         // Reset selected piece
         self.selectedPiece = nil
         
-        if checkGameOver() {
+        if gameState.isOver {
             isGameOver = true
-            winner = calculateWinner()
+            winner = gameState.winner
             
             var stats = persistence.loadStats()
             stats.gamesPlayed += 1
@@ -148,32 +163,26 @@ class GameViewModel: ObservableObject {
                                  "winner": winner.map { "player\($0)" } ?? "tie", "difficulty": selectedDifficulty
                                 ]
             )
+        } else {
+            requestComputerMoveIfDue()
         }
         
-        updateScores()
         return true
         
     }
     
     func resetGame() {
-        board = Array(repeating: nil, count: 9)
-
-        (player2Pieces, player1Pieces) = pieces(forDifficulty: selectedDifficulty)
-
-        currentPlayer = startingPlayer
+        let hands = pieces(forDifficulty: selectedDifficulty)
+        gameState = GameState(player1Hand: hands.player1, player2Hand: hands.computer, startingPlayer: startingPlayer)
         isGameOver = false
         winner = nil
-        player1Score = 0
-        player2Score = 0
+        requestComputerMoveIfDue()
     }
-
-    func checkGameOver() -> Bool {
-        Scoring.isFull(board)
-    }
-
-    /// Returns nil on a tie. Unreachable on the current fixed 9-cell board (an odd
-    /// count can't split evenly), kept explicit for correctness if that ever changes.
-    func calculateWinner() -> Int? {
-        Scoring.winner(on: board)
+    
+    // Tells the view the computer is due to move, but only in a PvC game that is still going
+    private func requestComputerMoveIfDue() {
+        if isPlayingComputer && currentPlayer == computerPlayer && !isGameOver {
+            computerTurnToken += 1
+        }
     }
 }

@@ -191,25 +191,4 @@ final class RulesCharacterizationTests : XCTestCase {
         XCTAssertEqual(viewModel.currentPlayer, 2, "the turn does not advance after the final move")
         XCTAssertFalse(play(stone(0, 0, 0, 0, owner: 1), at: 0, on: viewModel), "no moves after game over")
     }
-
-    func testCheckGameOver_isTrueOnlyWhenEveryCellIsFilled() {
-        let viewModel = makeViewModel()
-        XCTAssertFalse(viewModel.checkGameOver())
-
-        for cell in 0..<8 {
-            viewModel.board[cell] = stone(0, 0, 0, 0, owner: 1)
-        }
-        XCTAssertFalse(viewModel.checkGameOver())
-
-        viewModel.board[8] = stone(0, 0, 0, 0, owner: 2)
-        XCTAssertTrue(viewModel.checkGameOver())
-    }
-
-    func testCalculateWinner_fourAllWithOneEmptyCell_isATie() {
-        let viewModel = makeViewModel()
-        for cell in 0..<4 { viewModel.board[cell] = stone(0, 0, 0, 0, owner: 1) }
-        for cell in 4..<8 { viewModel.board[cell] = stone(0, 0, 0, 0, owner: 2) }
-
-        XCTAssertNil(viewModel.calculateWinner())
-    }
 }

@@ -70,7 +70,7 @@ struct PVCView: View {
             spacerView
         }
     }
-
+    
     var body: some View {
         ZStack {
             blackBackground
@@ -80,29 +80,23 @@ struct PVCView: View {
         }
         .onAppear {
             viewModel.setupComputerDifficulty(difficulty)
-            audioManager.playAudio(named: viewModel.musicDifficultyStrings.indices.contains(difficulty - 1)
-                                    ? viewModel.musicDifficultyStrings[difficulty - 1] : nil)
-            triggerComputerMoveIfNeeded()
+            audioManager.playAudio(named: viewModel.musicDifficultyStrings.indices.contains(difficulty - 1) ? viewModel.musicDifficultyStrings[difficulty - 1] : nil)
         }
         .onDisappear {
             audioManager.stopAudio()
         }
         .ignoresSafeArea(.all)
-        .onChange(of: viewModel.currentPlayer) { oldValue, newValue in
-            triggerComputerMoveIfNeeded()
-        }
-        // resetGame() re-sets currentPlayer to the value it already had when the
-        // computer made the last move, so the .onChange above never fires for it.
-        .onChange(of: viewModel.isGameOver) { _, isOver in
-            if !isOver { triggerComputerMoveIfNeeded() }
+        // The view model bumps this token every time the computer becomes due to move,
+        // including the first move of a fresh game, so the view never has to infer it.
+        .onChange(of: viewModel.computerTurnToken) { _, _ in
+            playComputerTurn()
         }
     }
-
-    // `.onChange` never fires for the value a @Published property already holds
-    // at first render, so the computer's very first move (when it starts the
-    // game) has to be triggered from `.onAppear` too, not just `.onChange`.
-    private func triggerComputerMoveIfNeeded() {
-        guard viewModel.currentPlayer == 2, !viewModel.isGameOver, !viewModel.isAITurnPending else { return }
+    
+    // Gives the computer a short "thinking" pause, then moves. The pending flag stops
+    // two requests from queueing two moves.
+    private func playComputerTurn() {
+        guard !viewModel.isAITurnPending else { return }
         viewModel.isAITurnPending = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             viewModel.performComputerMove()
