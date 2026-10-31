@@ -9,7 +9,7 @@ import XCTest
 @testable import Sigilstone
 
 /// A tiny deterministic random source, so a failing "random game" can be replayed.
-private struct SeededGenerator: RandomNumberGenerator {
+struct SeededGenerator: RandomNumberGenerator {
     private var state: UInt64
     init(seed: UInt64) { state = seed }
     mutating func next() -> UInt64 {

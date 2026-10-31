@@ -37,6 +37,10 @@
 		5B5A1E76309577C2007D2F91 /* ScoringTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A1E75309577C2007D2F91 /* ScoringTests.swift */; };
 		5B5A1E78309585E3007D2F91 /* GameRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A1E77309585E3007D2F91 /* GameRules.swift */; };
 		5B5A1E7A30958A3F007D2F91 /* GameRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A1E7930958A3F007D2F91 /* GameRulesTests.swift */; };
+		5B5A1E7C3095AA7E007D2F91 /* AIStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A1E7B3095AA7E007D2F91 /* AIStrategy.swift */; };
+		5B5A1E7E3095AA92007D2F91 /* AILevels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A1E7D3095AA92007D2F91 /* AILevels.swift */; };
+		5B5A1E803095C771007D2F91 /* AIStrategyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A1E7F3095C771007D2F91 /* AIStrategyTests.swift */; };
+		5B5A1E823095C79E007D2F91 /* AIEquivalenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A1E813095C79E007D2F91 /* AIEquivalenceTests.swift */; };
 		5B87817E2CEB19E1001B041B /* GameStringConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B87817D2CEB19E1001B041B /* GameStringConstants.swift */; };
 		5B8781802CEB1A28001B041B /* PlayerPiecesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B87817F2CEB1A28001B041B /* PlayerPiecesModel.swift */; };
 		6F9CDF8A601B4153FA4497BA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49595B86EEC2D0F7DB6C67E8 /* Foundation.framework */; };
@@ -91,6 +95,10 @@
 		5B5A1E75309577C2007D2F91 /* ScoringTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoringTests.swift; sourceTree = "<group>"; };
 		5B5A1E77309585E3007D2F91 /* GameRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRules.swift; sourceTree = "<group>"; };
 		5B5A1E7930958A3F007D2F91 /* GameRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRulesTests.swift; sourceTree = "<group>"; };
+		5B5A1E7B3095AA7E007D2F91 /* AIStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIStrategy.swift; sourceTree = "<group>"; };
+		5B5A1E7D3095AA92007D2F91 /* AILevels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AILevels.swift; sourceTree = "<group>"; };
+		5B5A1E7F3095C771007D2F91 /* AIStrategyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIStrategyTests.swift; sourceTree = "<group>"; };
+		5B5A1E813095C79E007D2F91 /* AIEquivalenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIEquivalenceTests.swift; sourceTree = "<group>"; };
 		5B87817D2CEB19E1001B041B /* GameStringConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStringConstants.swift; sourceTree = "<group>"; };
 		5B87817F2CEB1A28001B041B /* PlayerPiecesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerPiecesModel.swift; sourceTree = "<group>"; };
 		7083FB78E45630A62CDF352B /* AnalyticsServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnalyticsServiceTests.swift; sourceTree = "<group>"; };
@@ -215,6 +223,8 @@
 				5B5A1E6F30957269007D2F91 /* CaptureRules.swift */,
 				5B5A1E7330957590007D2F91 /* Scoring.swift */,
 				5B5A1E77309585E3007D2F91 /* GameRules.swift */,
+				5B5A1E7B3095AA7E007D2F91 /* AIStrategy.swift */,
+				5B5A1E7D3095AA92007D2F91 /* AILevels.swift */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -231,6 +241,8 @@
 				5B5A1E7130957524007D2F91 /* CaptureRulesTests.swift */,
 				5B5A1E75309577C2007D2F91 /* ScoringTests.swift */,
 				5B5A1E7930958A3F007D2F91 /* GameRulesTests.swift */,
+				5B5A1E7F3095C771007D2F91 /* AIStrategyTests.swift */,
+				5B5A1E813095C79E007D2F91 /* AIEquivalenceTests.swift */,
 			);
 			path = SigilstoneTests;
 			sourceTree = "<group>";
@@ -366,6 +378,8 @@
 				5B5A1E7030957269007D2F91 /* CaptureRules.swift in Sources */,
 				5B2089AD2C9E69D80064028E /* SigilstoneApp.swift in Sources */,
 				5B2089C52C9F5EC80064028E /* GameModel.swift in Sources */,
+				5B5A1E7C3095AA7E007D2F91 /* AIStrategy.swift in Sources */,
+				5B5A1E7E3095AA92007D2F91 /* AILevels.swift in Sources */,
 				5B2089BB2C9E6B2D0064028E /* GameBoardView.swift in Sources */,
 				5B87817E2CEB19E1001B041B /* GameStringConstants.swift in Sources */,
 				5B5A1E6C30955964007D2F91 /* GameState.swift in Sources */,
@@ -388,6 +402,8 @@
 				5B5A1E76309577C2007D2F91 /* ScoringTests.swift in Sources */,
 				5B5A1E7A30958A3F007D2F91 /* GameRulesTests.swift in Sources */,
 				5B5A1E6530953373007D2F91 /* RulesCharacterizationTests.swift in Sources */,
+				5B5A1E823095C79E007D2F91 /* AIEquivalenceTests.swift in Sources */,
+				5B5A1E803095C771007D2F91 /* AIStrategyTests.swift in Sources */,
 				AAAA00000000000000000001 /* AudioPlayerManagerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
