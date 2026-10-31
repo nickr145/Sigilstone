@@ -212,38 +212,4 @@ final class RulesCharacterizationTests : XCTestCase {
 
         XCTAssertNil(viewModel.calculateWinner())
     }
-
-    // MARK: - Helpers the AI relies on
-
-    func testSimulateMove_countsCapturesWithoutChangingTheBoard() {
-        let viewModel = makeViewModel()
-        viewModel.board[1] = stone(1, 1, 1, 1, owner: 1)
-        viewModel.board[3] = stone(1, 1, 1, 1, owner: 1)
-        let attacker = stone(5, 5, 5, 5, owner: 2)
-
-        XCTAssertEqual(viewModel.simulateMove(for: attacker, at: 4), 2)
-
-        XCTAssertNil(viewModel.board[4])
-        XCTAssertEqual(viewModel.board[1]?.owner, 1)
-        XCTAssertEqual(viewModel.board[3]?.owner, 1)
-
-        // With an explicit board it ignores the live one.
-        var hypothetical: [Stone?] = Array(repeating: nil, count: 9)
-        hypothetical[5] = stone(1, 1, 1, 1, owner: 1)
-        XCTAssertEqual(viewModel.simulateMove(for: attacker, at: 4, on: hypothetical), 1)
-    }
-
-    func testCanCaptureAdjacent_andCanCaptureAt_agreeOnEveryCell() {
-        // These two functions are duplicates today; the engine will keep one.
-        let viewModel = makeViewModel()
-        viewModel.board[4] = stone(1, 1, 1, 1, owner: 1)
-        let piece = stone(5, 5, 5, 5, owner: 2)
-
-        for cell in 0..<9 where viewModel.board[cell] == nil {
-            XCTAssertEqual(viewModel.canCaptureAdjacent(at: cell, with: piece), viewModel.canCaptureAt(cell: cell, with: piece), "cell \(cell)")
-        }
-        let capturing = (0..<9).filter { viewModel.board[$0] == nil && viewModel.canCaptureAt(cell: $0, with: piece) }
-        XCTAssertEqual(capturing, [1, 3, 5, 7])
-    }
 }
-

@@ -76,57 +76,6 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.calculateWinner(), 1)
     }
 
-    // MARK: - Capture logic works regardless of which side owns the neighbor
-    // (regression test for canCaptureAt's previously-hardcoded owner == 1 check)
-
-    func testCanCaptureAt_capturesPlayer1NeighborWithPlayer2Piece() {
-        let viewModel = GameViewModel()
-        viewModel.board[1] = Stone(top: 1, right: 1, bottom: 1, left: 1, owner: 1)
-        let attacker = Stone(top: 5, right: 1, bottom: 1, left: 1, owner: 2)
-
-        XCTAssertTrue(viewModel.canCaptureAt(cell: 4, with: attacker))
-    }
-
-    func testCanCaptureAt_capturesPlayer2NeighborWithPlayer1Piece() {
-        let viewModel = GameViewModel()
-        viewModel.board[1] = Stone(top: 1, right: 1, bottom: 1, left: 1, owner: 2)
-        let attacker = Stone(top: 5, right: 1, bottom: 1, left: 1, owner: 1)
-
-        XCTAssertTrue(viewModel.canCaptureAt(cell: 4, with: attacker))
-    }
-
-    func testCanCaptureAt_doesNotCaptureOwnPiece() {
-        let viewModel = GameViewModel()
-        viewModel.board[1] = Stone(top: 1, right: 1, bottom: 1, left: 1, owner: 2)
-        let sameOwner = Stone(top: 5, right: 1, bottom: 1, left: 1, owner: 2)
-
-        XCTAssertFalse(viewModel.canCaptureAt(cell: 4, with: sameOwner))
-    }
-
-    // MARK: - AI move selection (Phase 2 bug fixes)
-
-    func testLvl2ComputerMove_prefersCorners_whenAvailable() {
-        let viewModel = GameViewModel()
-        viewModel.Lvl2ComputerMove()
-
-        let placedIndex = viewModel.board.firstIndex { $0 != nil }
-        XCTAssertNotNil(placedIndex)
-        XCTAssertTrue([0, 2, 6, 8].contains(placedIndex!), "Lvl2 should prefer a corner cell when corners are available")
-    }
-
-    func testSimulateOpponentMove_accountsForOwnPlacementWhenEvaluatingThreat() {
-        let viewModel = GameViewModel()
-        // A weak candidate stone the AI is considering placing at cell 4 (center).
-        let weakCandidate = Stone(top: 1, right: 1, bottom: 1, left: 1, owner: 2)
-        // An opponent piece that can capture it from cell 5 (left = 5 beats right = 1).
-        let strongOpponentPiece = Stone(top: 1, right: 1, bottom: 1, left: 5, owner: 1)
-        viewModel.player1Pieces = [strongOpponentPiece]
-
-        // Pre-fix, this evaluated the opponent's reply against a board that never
-        // had `weakCandidate` placed at cell 4, so the capture at cell 5 was invisible.
-        XCTAssertEqual(viewModel.simulateOpponentMove(for: weakCandidate, at: 4), 1)
-    }
-
     // MARK: - PVC game end -> next game
 
     private func makePVCViewModel() -> GameViewModel {

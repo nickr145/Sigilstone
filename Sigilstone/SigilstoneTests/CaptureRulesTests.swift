@@ -72,4 +72,13 @@ final class CaptureRulesTests: XCTestCase {
         board[2] = stone(0, 0, 0, 0, owner: 1)
         XCTAssertEqual(CaptureRules.capturedCells(by: stone(0, 0, 0, 9, owner: 2), at: 3, on: board), [])
     }
+    
+    func testCapturedCells_worksForEitherPlayer() {
+        var board = emptyBoard()
+        board[1] = stone(1, 1, 1, 1, owner: 2)
+        XCTAssertEqual(CaptureRules.capturedCells(by: stone(5, 1, 1, 1, owner: 1), at: 4, on: board), [1])
+
+        board[1] = stone(1, 1, 1, 1, owner: 1)
+        XCTAssertEqual(CaptureRules.capturedCells(by: stone(5, 1, 1, 1, owner: 2), at: 4, on: board), [1])
+    }
 }
