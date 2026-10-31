@@ -47,8 +47,7 @@ final class RulesCharacterizationTests : XCTestCase {
             
             XCTAssertTrue(play(testCase.attacker, at: 4, on: viewModel))
             
-            XCTAssertEqual(viewModel.board[testCase.neighborCell]?.owner, 2,
-                           "\(testCase.direction): a higher facing edge should capture")
+            XCTAssertEqual(viewModel.board[testCase.neighborCell]?.owner, 2, "\(testCase.direction): a higher facing edge should capture")
         }
     }
     
@@ -127,8 +126,7 @@ final class RulesCharacterizationTests : XCTestCase {
 
             XCTAssertTrue(play(testCase.attacker, at: testCase.attackerCell, on: viewModel))
 
-            XCTAssertEqual(viewModel.board[testCase.victimCell]?.owner, 1,
-                           "cell \(testCase.attackerCell) must not capture across the row break at \(testCase.victimCell)")
+            XCTAssertEqual(viewModel.board[testCase.victimCell]?.owner, 1, "cell \(testCase.attackerCell) must not capture across the row break at \(testCase.victimCell)")
         }
     }
 
@@ -242,8 +240,7 @@ final class RulesCharacterizationTests : XCTestCase {
         let piece = stone(5, 5, 5, 5, owner: 2)
 
         for cell in 0..<9 where viewModel.board[cell] == nil {
-            XCTAssertEqual(viewModel.canCaptureAdjacent(at: cell, with: piece),
-                           viewModel.canCaptureAt(cell: cell, with: piece), "cell \(cell)")
+            XCTAssertEqual(viewModel.canCaptureAdjacent(at: cell, with: piece), viewModel.canCaptureAt(cell: cell, with: piece), "cell \(cell)")
         }
         let capturing = (0..<9).filter { viewModel.board[$0] == nil && viewModel.canCaptureAt(cell: $0, with: piece) }
         XCTAssertEqual(capturing, [1, 3, 5, 7])
