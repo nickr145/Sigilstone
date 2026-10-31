@@ -59,6 +59,21 @@ class GameViewModel: ObservableObject {
     
     var selectedDifficulty: Int = 1
     
+    // Bridge to the engine until GameState becomes the stored property (step 7):
+    // reads the published fields into a GameState, and writes a new one back.
+    private var gameState: GameState {
+        get {
+            GameState(board: board, player1Hand: player1Pieces, player2Hand: player2Pieces, currentPlayer: currentPlayer)
+        }
+        set {
+            board = newValue.board
+            player1Pieces = newValue.player1Hand
+            player2Pieces = newValue.player2Hand
+            currentPlayer = newValue.currentPlayer
+        }
+    }
+    
+    
     func updateScores() {
         player1Score = Scoring.score(for: 1, on: board)
         player2Score = Scoring.score(for: 2, on: board)
@@ -297,52 +312,89 @@ class GameViewModel: ObservableObject {
     func placeSelectedPiece(at index: Int) -> Bool {
         guard !isGameOver else { return false }
         guard let selectedPiece = selectedPiece else { return false }
-        guard selectedPiece.owner == currentPlayer else { return false }
-        guard index >= 0, index < board.count, board[index] == nil else { return false }
-
-        board[index] = selectedPiece
-        captureAdjacentStones(at: index)
-
-        // Remove the placed piece from its owner's available pieces
-        if selectedPiece.owner == 1 {
-            if let selectedIndex = player1Pieces.firstIndex(of: selectedPiece) {
-                player1Pieces.remove(at: selectedIndex)
-            }
-        } else {
-            if let selectedIndex = player2Pieces.firstIndex(of: selectedPiece) {
-                player2Pieces.remove(at: selectedIndex)
-            }
-        }
-
+        
+        // The engine decides what is legal and what a move does. This function only
+        // writes the result back and handles what happens when the game ends.
+        let move = Move(stone: selectedPiece, cell: index)
+        guard GameRules.isLegal(move, in: gameState) else { return false }
+        gameState = GameRules.apply(move, to: gameState)
+        
         // Reset selected piece
         self.selectedPiece = nil
-
+        
         if checkGameOver() {
             isGameOver = true
             winner = calculateWinner()
-
+            
             var stats = persistence.loadStats()
             stats.gamesPlayed += 1
             if let winner = winner {
                 if winner == 1 { stats.gamesWonByPlayer1 += 1 } else { stats.gamesWonByPlayer2 += 1 }
             }
             persistence.save(stats)
-
-            analytics.track(event: "game_ended", properties: ["mode": "pvc", "winner": winner.map { "player\($0)" } ?? "tie", "difficulty": selectedDifficulty])
-        } else {
-            currentPlayer = currentPlayer == 1 ? 2 : 1
+            analytics.track(event: "game_ended",
+                            properties:
+                                ["mode": "pvc",
+                                 "winner": winner.map { "player\($0)" } ?? "tie", "difficulty": selectedDifficulty
+                                ]
+            )
         }
-
+        
         updateScores()
         return true
+        
     }
+    
+//    @discardableResult
+//    func placeSelectedPiece(at index: Int) -> Bool {
+//        guard !isGameOver else { return false }
+//        guard let selectedPiece = selectedPiece else { return false }
+//        guard selectedPiece.owner == currentPlayer else { return false }
+//        guard index >= 0, index < board.count, board[index] == nil else { return false }
+//
+//        board[index] = selectedPiece
+//        captureAdjacentStones(at: index)
+//
+//        // Remove the placed piece from its owner's available pieces
+//        if selectedPiece.owner == 1 {
+//            if let selectedIndex = player1Pieces.firstIndex(of: selectedPiece) {
+//                player1Pieces.remove(at: selectedIndex)
+//            }
+//        } else {
+//            if let selectedIndex = player2Pieces.firstIndex(of: selectedPiece) {
+//                player2Pieces.remove(at: selectedIndex)
+//            }
+//        }
+//
+//        // Reset selected piece
+//        self.selectedPiece = nil
+//
+//        if checkGameOver() {
+//            isGameOver = true
+//            winner = calculateWinner()
+//
+//            var stats = persistence.loadStats()
+//            stats.gamesPlayed += 1
+//            if let winner = winner {
+//                if winner == 1 { stats.gamesWonByPlayer1 += 1 } else { stats.gamesWonByPlayer2 += 1 }
+//            }
+//            persistence.save(stats)
+//
+//            analytics.track(event: "game_ended", properties: ["mode": "pvc", "winner": winner.map { "player\($0)" } ?? "tie", "difficulty": selectedDifficulty])
+//        } else {
+//            currentPlayer = currentPlayer == 1 ? 2 : 1
+//        }
+//
+//        updateScores()
+//        return true
+//    }
 
-    func captureAdjacentStones(at index: Int) {
-        guard let stone = board[index] else { return }
-        for neighborIndex in CaptureRules.capturedCells(by: stone, at: index, on: board) {
-            board[neighborIndex]?.owner = stone.owner
-        }
-    }
+//    func captureAdjacentStones(at index: Int) {
+//        guard let stone = board[index] else { return }
+//        for neighborIndex in CaptureRules.capturedCells(by: stone, at: index, on: board) {
+//            board[neighborIndex]?.owner = stone.owner
+//        }
+//    }
     
     
     func resetGame() {
