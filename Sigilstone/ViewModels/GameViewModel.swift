@@ -266,35 +266,37 @@ class GameViewModel: ObservableObject {
 
     // Shared neighbor lookup used by every capture-related function below, so
     // the top/bottom/left/right bounds math only lives in one place.
-    private func neighborIndices(of index: Int) -> [(direction: Direction, index: Int)] {
-        var result: [(direction: Direction, index: Int)] = []
-        if index >= 3 { result.append((.top, index - 3)) }
-        if index <= 5 { result.append((.bottom, index + 3)) }
-        if index % 3 != 0 { result.append((.left, index - 1)) }
-        if index % 3 != 2 { result.append((.right, index + 1)) }
-        return result
-    }
+//    private func neighborIndices(of index: Int) -> [(direction: Direction, index: Int)] {
+//        var result: [(direction: Direction, index: Int)] = []
+//        if index >= 3 { result.append((.top, index - 3)) }
+//        if index <= 5 { result.append((.bottom, index + 3)) }
+//        if index % 3 != 0 { result.append((.left, index - 1)) }
+//        if index % 3 != 2 { result.append((.right, index + 1)) }
+//        return result
+//    }
 
     // Logic for being able to capture adjacent cells with a given piece for level 3 AI
     func canCaptureAdjacent(at index: Int, with piece: Stone) -> Bool {
-        for (direction, neighborIndex) in neighborIndices(of: index) {
-            if let neighborStone = board[neighborIndex], neighborStone.owner != piece.owner,
-               piece.canCapture(neighborStone, direction: direction) {
-                return true
-            }
-        }
-        return false
+//        for (direction, neighborIndex) in neighborIndices(of: index) {
+//            if let neighborStone = board[neighborIndex], neighborStone.owner != piece.owner,
+//               piece.canCapture(neighborStone, direction: direction) {
+//                return true
+//            }
+//        }
+//        return false
+        canCaptureAt(cell: index, with: piece)
     }
 
     // Logic to capture a certain cell for a given piece for level 4 AI
     func canCaptureAt(cell: Int, with piece: Stone) -> Bool {
-        for (direction, neighborIndex) in neighborIndices(of: cell) {
-            if let neighborStone = board[neighborIndex], neighborStone.owner != piece.owner,
-               piece.canCapture(neighborStone, direction: direction) {
-                return true
-            }
-        }
-        return false
+//        for (direction, neighborIndex) in neighborIndices(of: cell) {
+//            if let neighborStone = board[neighborIndex], neighborStone.owner != piece.owner,
+//               piece.canCapture(neighborStone, direction: direction) {
+//                return true
+//            }
+//        }
+//        return false
+        !CaptureRules.capturedCells(by: piece, at: cell, on: board).isEmpty
     }
 
     // Logic to simulate a certain move and return how many stones can be potentially
@@ -310,14 +312,15 @@ class GameViewModel: ObservableObject {
     // Logic to identify all capturable stones at a place in the board for level 5/6 AI
     func captureSimulatedStones(at index: Int, board: [Stone?]) -> Int {
         guard let stone = board[index] else { return 0 }
-        var capturedCount = 0
-        for (direction, neighborIndex) in neighborIndices(of: index) {
-            if let neighborStone = board[neighborIndex], neighborStone.owner != stone.owner,
-               stone.canCapture(neighborStone, direction: direction) {
-                capturedCount += 1
-            }
-        }
-        return capturedCount
+//        var capturedCount = 0
+//        for (direction, neighborIndex) in neighborIndices(of: index) {
+//            if let neighborStone = board[neighborIndex], neighborStone.owner != stone.owner,
+//               stone.canCapture(neighborStone, direction: direction) {
+//                capturedCount += 1
+//            }
+//        }
+//        return capturedCount
+        return CaptureRules.capturedCells(by: stone, at: index, on: board).count
     }
     
     
@@ -371,11 +374,14 @@ class GameViewModel: ObservableObject {
 
     func captureAdjacentStones(at index: Int) {
         guard let stone = board[index] else { return }
-        for (direction, neighborIndex) in neighborIndices(of: index) {
-            if let neighborStone = board[neighborIndex], neighborStone.owner != stone.owner,
-               stone.canCapture(neighborStone, direction: direction) {
-                board[neighborIndex]?.owner = stone.owner
-            }
+//        for (direction, neighborIndex) in neighborIndices(of: index) {
+//            if let neighborStone = board[neighborIndex], neighborStone.owner != stone.owner,
+//               stone.canCapture(neighborStone, direction: direction) {
+//                board[neighborIndex]?.owner = stone.owner
+//            }
+//        }
+        for neighborIndex in CaptureRules.capturedCells(by: stone, at: index, on: board) {
+            board[neighborIndex]?.owner = stone.owner
         }
     }
     
