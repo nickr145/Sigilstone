@@ -33,6 +33,8 @@
 		5B5A1E6E30955A57007D2F91 /* EngineStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A1E6D30955A57007D2F91 /* EngineStateTests.swift */; };
 		5B5A1E7030957269007D2F91 /* CaptureRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A1E6F30957269007D2F91 /* CaptureRules.swift */; };
 		5B5A1E7230957524007D2F91 /* CaptureRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A1E7130957524007D2F91 /* CaptureRulesTests.swift */; };
+		5B5A1E7430957590007D2F91 /* Scoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A1E7330957590007D2F91 /* Scoring.swift */; };
+		5B5A1E76309577C2007D2F91 /* ScoringTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A1E75309577C2007D2F91 /* ScoringTests.swift */; };
 		5B87817E2CEB19E1001B041B /* GameStringConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B87817D2CEB19E1001B041B /* GameStringConstants.swift */; };
 		5B8781802CEB1A28001B041B /* PlayerPiecesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B87817F2CEB1A28001B041B /* PlayerPiecesModel.swift */; };
 		6F9CDF8A601B4153FA4497BA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49595B86EEC2D0F7DB6C67E8 /* Foundation.framework */; };
@@ -83,6 +85,8 @@
 		5B5A1E6D30955A57007D2F91 /* EngineStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineStateTests.swift; sourceTree = "<group>"; };
 		5B5A1E6F30957269007D2F91 /* CaptureRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureRules.swift; sourceTree = "<group>"; };
 		5B5A1E7130957524007D2F91 /* CaptureRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureRulesTests.swift; sourceTree = "<group>"; };
+		5B5A1E7330957590007D2F91 /* Scoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scoring.swift; sourceTree = "<group>"; };
+		5B5A1E75309577C2007D2F91 /* ScoringTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoringTests.swift; sourceTree = "<group>"; };
 		5B87817D2CEB19E1001B041B /* GameStringConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStringConstants.swift; sourceTree = "<group>"; };
 		5B87817F2CEB1A28001B041B /* PlayerPiecesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerPiecesModel.swift; sourceTree = "<group>"; };
 		7083FB78E45630A62CDF352B /* AnalyticsServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnalyticsServiceTests.swift; sourceTree = "<group>"; };
@@ -205,6 +209,7 @@
 				5B5A1E6930955959007D2F91 /* BoardGeometry.swift */,
 				5B5A1E6B30955964007D2F91 /* GameState.swift */,
 				5B5A1E6F30957269007D2F91 /* CaptureRules.swift */,
+				5B5A1E7330957590007D2F91 /* Scoring.swift */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -219,6 +224,7 @@
 				5B5A1E6430953373007D2F91 /* RulesCharacterizationTests.swift */,
 				5B5A1E6D30955A57007D2F91 /* EngineStateTests.swift */,
 				5B5A1E7130957524007D2F91 /* CaptureRulesTests.swift */,
+				5B5A1E75309577C2007D2F91 /* ScoringTests.swift */,
 			);
 			path = SigilstoneTests;
 			sourceTree = "<group>";
@@ -357,6 +363,7 @@
 				5B2089BB2C9E6B2D0064028E /* GameBoardView.swift in Sources */,
 				5B87817E2CEB19E1001B041B /* GameStringConstants.swift in Sources */,
 				5B5A1E6C30955964007D2F91 /* GameState.swift in Sources */,
+				5B5A1E7430957590007D2F91 /* Scoring.swift in Sources */,
 				54606C99366B10879D8EA422 /* PersistenceManager.swift in Sources */,
 				13AD630B01C64ECD2955CC7E /* AnalyticsService.swift in Sources */,
 			);
@@ -371,6 +378,7 @@
 				F86E07674771088A442DA2E7 /* PersistenceManagerTests.swift in Sources */,
 				1F70211B2240A2FF1030E4CA /* AnalyticsServiceTests.swift in Sources */,
 				5B5A1E6E30955A57007D2F91 /* EngineStateTests.swift in Sources */,
+				5B5A1E76309577C2007D2F91 /* ScoringTests.swift in Sources */,
 				5B5A1E6530953373007D2F91 /* RulesCharacterizationTests.swift in Sources */,
 				AAAA00000000000000000001 /* AudioPlayerManagerTests.swift in Sources */,
 			);

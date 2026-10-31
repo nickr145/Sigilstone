@@ -35,7 +35,7 @@ struct GameState: Equatable {
     
     /// The game ends when every cell is filled
     var isOver: Bool {
-        emptyCells.isEmpty
+        Scoring.isFull(board)
     }
     
     func hand(for player: Int) -> [Stone] {
@@ -43,15 +43,12 @@ struct GameState: Equatable {
     }
     
     func score(for player: Int) -> Int {
-        board.filter { $0?.owner == player }.count
+        Scoring.score(for: player, on: board)
     }
     
     /// The player with more stones, or nil on a tie
     var winner: Int? {
-        let player1 = score(for: 1)
-        let player2 = score(for: 2)
-        if player1 == player2 { return nil }
-        return player1 > player2 ? 1 : 2
+        Scoring.winner(on: board)
     }
 }
 
