@@ -156,18 +156,16 @@ class GameViewModel: ObservableObject {
             isGameOver = true
             winner = gameState.winner
             
-            var stats = persistence.loadStats()
-            stats.gamesPlayed += 1
-            if let winner = winner {
-                if winner == 1 { stats.gamesWonByPlayer1 += 1 } else { stats.gamesWonByPlayer2 += 1 }
+            // Stats and analytics cover PvC games only.
+            if isPlayingComputer {
+                var stats = persistence.loadStats()
+                stats.gamesPlayed += 1
+                if let winner = winner {
+                    if winner == 1 { stats.gamesWonByPlayer1 += 1 } else { stats.gamesWonByPlayer2 += 1 }
+                }
+                persistence.save(stats)
+                analytics.track(event: "game_ended", properties: ["mode": "pvc", "winner": winner.map { "player\($0)" } ?? "tie", "difficulty": selectedDifficulty])
             }
-            persistence.save(stats)
-            analytics.track(event: "game_ended",
-                            properties:
-                                ["mode": "pvc",
-                                 "winner": winner.map { "player\($0)" } ?? "tie", "difficulty": selectedDifficulty
-                                ]
-            )
         } else {
             requestComputerMoveIfDue()
         }

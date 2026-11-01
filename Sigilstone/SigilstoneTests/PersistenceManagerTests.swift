@@ -40,6 +40,7 @@ final class PersistenceManagerTests: XCTestCase {
     func testGameViewModel_incrementsStatsOnWin() {
         let inMemoryStore = InMemoryPersistenceStore()
         let viewModel = GameViewModel(persistence: inMemoryStore)
+        viewModel.setupComputerDifficulty(1) // stats are recorded for PvC games only
 
         // Fill the board so checkGameOver() becomes true after the next placement.
         // currentPlayer starts at 2; alternate turns, always placing whichever
