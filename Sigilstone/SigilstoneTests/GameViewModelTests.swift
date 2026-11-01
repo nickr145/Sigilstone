@@ -189,4 +189,23 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.player1Pieces, startingHand1, "player 1 should get the PvP starting hand again")
         XCTAssertEqual(viewModel.player2Pieces, startingHand2, "player 2 should get the PvP starting hand again")
     }
+    
+    // MARK: - Stats and analytics are PvC-only
+    func testPvpGame_isNotRecordedInStatsOrAnalytics() {
+        let store = InMemoryPersistenceStore()
+        let spy = SpyAnalyticsService()
+        let viewModel = GameViewModel(persistence: store, analytics: spy)
+        
+        while !viewModel.isGameOver {
+            let hand = viewModel.currentPlayer == 1 ? viewModel.player1Pieces : viewModel.player2Pieces
+            viewModel.selectedPiece = hand[0]
+            XCTAssertTrue(viewModel.placeSelectedPiece(at: viewModel.board.firstIndex { $0 == nil }!))
+        }
+        
+        XCTAssertEqual(store.loadStats().gamesPlayed, 0, "PvP games don't count toward stats")
+        XCTAssertFalse(spy.trackedEvents.contains { $0.event == "game_ended" })
+
+    }
 }
+
+
