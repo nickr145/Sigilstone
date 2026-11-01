@@ -169,4 +169,24 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.player1Score, 1)
         XCTAssertEqual(viewModel.player2Score, 0)
     }
+    
+    // MARK: - PvP reset
+    
+    func testPvpReset_refillsTheOriginalHands() {
+        let viewModel = GameViewModel(persistence: InMemoryPersistenceStore(), analytics: SpyAnalyticsService())
+        let startingHand1 = viewModel.player1Pieces
+        let startingHand2 = viewModel.player2Pieces
+        
+        // Play a PvP game to the end: whoever's turn it is places their first stone in the first empty cell
+        while !viewModel.isGameOver {
+            let hand = viewModel.currentPlayer == 1 ? viewModel.player1Pieces : viewModel.player2Pieces
+            viewModel.selectedPiece = hand[0]
+            XCTAssertTrue(viewModel.placeSelectedPiece(at: viewModel.board.firstIndex { $0 == nil }!))
+        }
+        
+        viewModel.resetGame()
+        
+        XCTAssertEqual(viewModel.player1Pieces, startingHand1, "player 1 should get the PvP starting hand again")
+        XCTAssertEqual(viewModel.player2Pieces, startingHand2, "player 2 should get the PvP starting hand again")
+    }
 }

@@ -74,6 +74,9 @@ class GameViewModel: ObservableObject {
 
     private let persistence: PersistenceStore
     private let analytics: AnalyticsService
+    
+    private let pvpPlayer1Hand: [Stone]
+    private let pvpPlayer2Hand: [Stone]
 
     init(persistence: PersistenceStore = UserDefaultsPersistenceStore(), analytics: AnalyticsService = ConsoleAnalyticsService()) {
         let piecesModel = PlayerPiecesModel()
@@ -87,6 +90,8 @@ class GameViewModel: ObservableObject {
         self.player1PiecesForEachDifficulty = piecesModel.player1PiecesForEachDifficulty
         self.persistence = persistence
         self.analytics = analytics
+        self.pvpPlayer1Hand = piecesModel.player1Pieces
+        self.pvpPlayer2Hand = piecesModel.player2Pieces
     }
     
     var selectedDifficulty: Int = 1
@@ -172,8 +177,18 @@ class GameViewModel: ObservableObject {
     }
     
     func resetGame() {
-        let hands = pieces(forDifficulty: selectedDifficulty)
-        gameState = GameState(player1Hand: hands.player1, player2Hand: hands.computer, startingPlayer: startingPlayer)
+        let player1Hand: [Stone]
+        let player2Hand: [Stone]
+        if isPlayingComputer {
+            let hands = pieces(forDifficulty: selectedDifficulty)
+            player1Hand = hands.player1
+            player2Hand = hands.computer
+        } else {
+            // PvP never sets a difficulty, so refill with the hands the game started with.
+            player1Hand = pvpPlayer1Hand
+            player2Hand = pvpPlayer2Hand
+        }
+        gameState = GameState(player1Hand: player1Hand, player2Hand: player2Hand, startingPlayer: startingPlayer)
         isGameOver = false
         winner = nil
         requestComputerMoveIfDue()
