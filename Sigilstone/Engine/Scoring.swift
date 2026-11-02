@@ -13,10 +13,10 @@ enum Scoring {
         board.filter { $0?.owner == player }.count
     }
     
-    /// The game ends when every cell is filled.
-    static func isFull(_ board: [Stone?]) -> Bool {
-        !board.contains { $0 == nil }
-    }
+//    /// The game ends when every cell is filled.
+//    static func isFull(_ board: [Stone?]) -> Bool {
+//        !board.contains { $0 == nil }
+//    }
         
     /// The player with more stones, or nil on a tie. A tie can't happen on a full
     /// 9-cell board (9 is odd), but the rule stays explicit for boards with blocks later.

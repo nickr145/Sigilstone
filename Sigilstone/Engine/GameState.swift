@@ -21,6 +21,11 @@ struct GameState: Equatable {
     var player1Hand: [Stone]
     var player2Hand: [Stone]
     var currentPlayer: Int
+    /// The element of each cell's square, or nil for a plain cell. Stones placed on an
+    /// elemental square must match it or they break.
+    var cellElements: [Element?] = Array(repeating: nil, count: BoardGeometry.cellCount)
+    /// Cells holding a block: a broken stone that can't be played on, owned or scored.
+    var blocks: Set<Int> = []
     
     init(player1Hand: [Stone], player2Hand: [Stone], startingPlayer: Int) {
         self.board = Array(repeating: nil, count: BoardGeometry.cellCount)
@@ -36,13 +41,14 @@ struct GameState: Equatable {
         self.currentPlayer = currentPlayer
     }
     
+    /// Cells that are neither holding a stone nor blocked.
     var emptyCells: [Int] {
-        board.indices.filter { board[$0] == nil }
+        board.indices.filter { board[$0] == nil && !blocks.contains($0) }
     }
     
-    /// The game ends when every cell is filled
+    /// The game ends when every cell is filled or blocked
     var isOver: Bool {
-        Scoring.isFull(board)
+        emptyCells.isEmpty
     }
     
     func hand(for player: Int) -> [Stone] {

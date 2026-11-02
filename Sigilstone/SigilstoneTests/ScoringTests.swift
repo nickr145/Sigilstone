@@ -30,11 +30,11 @@ final class ScoringTests: XCTestCase {
         XCTAssertEqual(Scoring.score(for: 2, on: b), 0)
     }
 
-    func testIsFull_onlyWhenNoCellIsEmpty() {
-        XCTAssertFalse(Scoring.isFull(board(owners: Array(repeating: nil, count: 9))))
-        XCTAssertFalse(Scoring.isFull(board(owners: [1, 2, 1, 2, 1, 2, 1, 2, nil])))
-        XCTAssertTrue(Scoring.isFull(board(owners: [1, 2, 1, 2, 1, 2, 1, 2, 1])))
-    }
+//    func testIsFull_onlyWhenNoCellIsEmpty() {
+//        XCTAssertFalse(Scoring.isFull(board(owners: Array(repeating: nil, count: 9))))
+//        XCTAssertFalse(Scoring.isFull(board(owners: [1, 2, 1, 2, 1, 2, 1, 2, nil])))
+//        XCTAssertTrue(Scoring.isFull(board(owners: [1, 2, 1, 2, 1, 2, 1, 2, 1])))
+//    }
 
     func testWinner_moreStonesWins_equalIsATie() {
         XCTAssertEqual(Scoring.winner(on: board(owners: [1, 1, 2, nil, nil, nil, nil, nil, nil])), 1)

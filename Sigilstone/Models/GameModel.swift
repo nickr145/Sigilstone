@@ -14,6 +14,7 @@ struct Stone: Identifiable, Equatable {
     var bottom: Int
     var left: Int
     var owner: Int
+    var element: Element? = nil
 
     func canCapture(_ adjacentStone: Stone, direction: Direction) -> Bool {
         switch direction {
