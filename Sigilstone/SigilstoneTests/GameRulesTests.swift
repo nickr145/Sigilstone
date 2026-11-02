@@ -166,4 +166,23 @@ final class GameRulesTests: XCTestCase {
             XCTAssertEqual(viewModel.player2Score, state.score(for: 2), "game \(game)")
         }
     }
+    
+    // MARK: - Blocked cells
+    
+    func testBlockedCells_areNotLegalAndNotListed() {
+        var state = freshState()
+        state.blocks = [4]
+
+        XCTAssertFalse(GameRules.isLegal(Move(stone: state.player2Hand[0], cell: 4), in: state))
+        XCTAssertEqual(GameRules.legalMoves(in: state).count, 40)
+        XCTAssertFalse(GameRules.legalMoves(in: state).contains { $0.cell == 4 })
+    }
+
+    func testLegalMoves_noneWhenEveryCellIsBlocked() {
+        var state = freshState()
+        state.blocks = Set(0..<9)
+
+        XCTAssertTrue(state.isOver)
+        XCTAssertTrue(GameRules.legalMoves(in: state).isEmpty)
+    }
 }

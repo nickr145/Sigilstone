@@ -102,4 +102,45 @@ final class EngineStateTests: XCTestCase {
         XCTAssertEqual(original.currentPlayer, 2)
         XCTAssertNotEqual(original, copy)
     }
+    
+    // MARK: - Elements and blocks
+    
+    func testNewState_hasNoBlocksAndNoElementalSquares() {
+        let state = GameState(player1Hand: [], player2Hand: [], startingPlayer: 2)
+        XCTAssertTrue(state.blocks.isEmpty)
+        XCTAssertEqual(state.cellElements.count, 9)
+        XCTAssertTrue(state.cellElements.allSatisfy { $0 == nil })
+    }
+    
+    func testStone_hasNoElementByDefault() {
+        XCTAssertNil(blank(owner: 1).element)
+    }
+    
+    func testBlocks_areNotEmptyCells_andCountAsFilledForTheEndOfTheGame() {
+        var state = GameState(player1Hand: [], player2Hand: [], startingPlayer: 2)
+        var domain = [1, 2, 3, 5, 6, 7, 8]
+        state.blocks = [0, 4]
+        XCTAssertEqual(state.emptyCells, domain)
+        XCTAssertFalse(state.isOver)
+        
+        for cell in domain {
+            state.board[cell] = blank(owner: cell % 2 == 0 ? 1 : 2)
+        }
+        
+        XCTAssertTrue(state.isOver, "every cell holds a stone or a block")
+    }
+    
+    func testBlocks_doNotScore_soATieIsPossible() {
+        var state = GameState(player1Hand: [], player2Hand: [], startingPlayer: 2)
+        state.blocks = [0, 1, 2]
+        for cell in 3..<6 { state.board[cell] = blank(owner: 1)}
+        for cell in 6..<9 { state.board[cell] = blank(owner: 2)}
+        
+        XCTAssertTrue(state.isOver)
+        XCTAssertEqual(state.score(for: 1), 3)
+        XCTAssertEqual(state.score(for: 2), 3)
+        XCTAssertNil(state.winner)
+        
+    }
 }
+

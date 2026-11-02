@@ -17,7 +17,7 @@ enum GameRules {
         guard !state.isOver else { return false }
         guard move.stone.owner == state.currentPlayer else { return false }
         guard state.board.indices.contains(move.cell) else { return false }
-        return state.board[move.cell] == nil
+        return state.board[move.cell] == nil && !state.blocks.contains(move.cell)
     }
     
     /// Every move the player to move can make from their hand: for each empty cell
