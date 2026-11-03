@@ -41,16 +41,17 @@
 		5B5A1E7E3095AA92007D2F91 /* AILevels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A1E7D3095AA92007D2F91 /* AILevels.swift */; };
 		5B5A1E803095C771007D2F91 /* AIStrategyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A1E7F3095C771007D2F91 /* AIStrategyTests.swift */; };
 		5B7B75E93099885600ABE62B /* BoardGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75E83099885600ABE62B /* BoardGenerator.swift */; };
-		5B7B75EB3099886C00ABE62B /* PlaceholderElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75EA3099886300ABE62B /* PlaceholderElements.swift */; };
 		5B7B75ED309988B000ABE62B /* BoardGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75EC309988B000ABE62B /* BoardGeneratorTests.swift */; };
 		5B7B75F1309B2D02007D2F91 /* TileSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75F1309B2D01007D2F91 /* TileSetTests.swift */; };
 		5B7B75F2309C3E02007D2F91 /* LevelStrengthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75F2309C3E01007D2F91 /* LevelStrengthTests.swift */; };
+		5B7B75F3309D4F02007D2F91 /* DeckTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75F3309D4F01007D2F91 /* DeckTests.swift */; };
 		5B7B75F0309A1C02007D2F91 /* ElementStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75F0309A1C01007D2F91 /* ElementStyle.swift */; };
 		5B7B75F0309A1C04007D2F91 /* BlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75F0309A1C03007D2F91 /* BlockView.swift */; };
 		5B87817E2CEB19E1001B041B /* GameStringConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B87817D2CEB19E1001B041B /* GameStringConstants.swift */; };
-		5B8781802CEB1A28001B041B /* PlayerPiecesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B87817F2CEB1A28001B041B /* PlayerPiecesModel.swift */; };
 		5BAD92C8309841570088075E /* Element.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BAD92C7309841570088075E /* Element.swift */; };
 		5B7B75F1309B2D04007D2F91 /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75F1309B2D03007D2F91 /* Tile.swift */; };
+		5B7B75F4309E5002007D2F91 /* Decks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75F4309E5001007D2F91 /* Decks.swift */; };
+		5B7B75F4309E5004007D2F91 /* Starter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75F4309E5003007D2F91 /* Starter.swift */; };
 		5B7B75F1309B2D06007D2F91 /* TileSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75F1309B2D05007D2F91 /* TileSet.swift */; };
 		6F9CDF8A601B4153FA4497BA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49595B86EEC2D0F7DB6C67E8 /* Foundation.framework */; };
 		8C894EC9F874482ACC5AFFD8 /* GameViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228422B18A73CBA378674E6E /* GameViewModelTests.swift */; };
@@ -108,16 +109,17 @@
 		5B5A1E7D3095AA92007D2F91 /* AILevels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AILevels.swift; sourceTree = "<group>"; };
 		5B5A1E7F3095C771007D2F91 /* AIStrategyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIStrategyTests.swift; sourceTree = "<group>"; };
 		5B7B75E83099885600ABE62B /* BoardGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardGenerator.swift; sourceTree = "<group>"; };
-		5B7B75EA3099886300ABE62B /* PlaceholderElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderElements.swift; sourceTree = "<group>"; };
 		5B7B75EC309988B000ABE62B /* BoardGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardGeneratorTests.swift; sourceTree = "<group>"; };
 		5B7B75F1309B2D01007D2F91 /* TileSetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileSetTests.swift; sourceTree = "<group>"; };
 		5B7B75F2309C3E01007D2F91 /* LevelStrengthTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelStrengthTests.swift; sourceTree = "<group>"; };
+		5B7B75F3309D4F01007D2F91 /* DeckTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckTests.swift; sourceTree = "<group>"; };
 		5B7B75F0309A1C01007D2F91 /* ElementStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElementStyle.swift; sourceTree = "<group>"; };
 		5B7B75F0309A1C03007D2F91 /* BlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockView.swift; sourceTree = "<group>"; };
 		5B87817D2CEB19E1001B041B /* GameStringConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStringConstants.swift; sourceTree = "<group>"; };
-		5B87817F2CEB1A28001B041B /* PlayerPiecesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerPiecesModel.swift; sourceTree = "<group>"; };
 		5BAD92C7309841570088075E /* Element.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Element.swift; sourceTree = "<group>"; };
 		5B7B75F1309B2D03007D2F91 /* Tile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tile.swift; sourceTree = "<group>"; };
+		5B7B75F4309E5001007D2F91 /* Decks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Decks.swift; sourceTree = "<group>"; };
+		5B7B75F4309E5003007D2F91 /* Starter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Starter.swift; sourceTree = "<group>"; };
 		5B7B75F1309B2D05007D2F91 /* TileSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileSet.swift; sourceTree = "<group>"; };
 		7083FB78E45630A62CDF352B /* AnalyticsServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnalyticsServiceTests.swift; sourceTree = "<group>"; };
 		7610716BE3A33919B58F1E74 /* PersistenceManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PersistenceManager.swift; sourceTree = "<group>"; };
@@ -219,12 +221,12 @@
 		5B2089C72C9F7E440064028E /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				5B7B75EA3099886300ABE62B /* PlaceholderElements.swift */,
 				5B2089C42C9F5EC80064028E /* GameModel.swift */,
 				5B87817D2CEB19E1001B041B /* GameStringConstants.swift */,
-				5B87817F2CEB1A28001B041B /* PlayerPiecesModel.swift */,
 				5BAD92C7309841570088075E /* Element.swift */,
 				5B7B75F1309B2D03007D2F91 /* Tile.swift */,
+				5B7B75F4309E5001007D2F91 /* Decks.swift */,
+				5B7B75F4309E5003007D2F91 /* Starter.swift */,
 				5B7B75F1309B2D05007D2F91 /* TileSet.swift */,
 			);
 			path = Models;
@@ -270,6 +272,7 @@
 				5B7B75EC309988B000ABE62B /* BoardGeneratorTests.swift */,
 				5B7B75F1309B2D01007D2F91 /* TileSetTests.swift */,
 				5B7B75F2309C3E01007D2F91 /* LevelStrengthTests.swift */,
+				5B7B75F3309D4F01007D2F91 /* DeckTests.swift */,
 			);
 			path = SigilstoneTests;
 			sourceTree = "<group>";
@@ -389,7 +392,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B7B75EB3099886C00ABE62B /* PlaceholderElements.swift in Sources */,
 				5B2089BF2C9E71CA0064028E /* GameViewModel.swift in Sources */,
 				5B5A1E6A30955959007D2F91 /* BoardGeometry.swift in Sources */,
 				5B2089E82CC0BBDB0064028E /* DifficultySelectionView.swift in Sources */,
@@ -402,7 +404,6 @@
 				5B7B75F0309A1C04007D2F91 /* BlockView.swift in Sources */,
 				5B2089BD2C9E6D210064028E /* StoneView.swift in Sources */,
 				5B2089DF2CA8FA380064028E /* PieceSelectionView.swift in Sources */,
-				5B8781802CEB1A28001B041B /* PlayerPiecesModel.swift in Sources */,
 				5B2089D12CA0F4310064028E /* TitleView.swift in Sources */,
 				5B2089D52CA24AB20064028E /* PVCView.swift in Sources */,
 				5B5A1E7030957269007D2F91 /* CaptureRules.swift in Sources */,
@@ -410,6 +411,8 @@
 				5B2089C52C9F5EC80064028E /* GameModel.swift in Sources */,
 				5BAD92C8309841570088075E /* Element.swift in Sources */,
 				5B7B75F1309B2D04007D2F91 /* Tile.swift in Sources */,
+				5B7B75F4309E5002007D2F91 /* Decks.swift in Sources */,
+				5B7B75F4309E5004007D2F91 /* Starter.swift in Sources */,
 				5B7B75F1309B2D06007D2F91 /* TileSet.swift in Sources */,
 				5B5A1E7C3095AA7E007D2F91 /* AIStrategy.swift in Sources */,
 				5B5A1E7E3095AA92007D2F91 /* AILevels.swift in Sources */,
@@ -438,6 +441,7 @@
 				5B7B75ED309988B000ABE62B /* BoardGeneratorTests.swift in Sources */,
 				5B7B75F1309B2D02007D2F91 /* TileSetTests.swift in Sources */,
 				5B7B75F2309C3E02007D2F91 /* LevelStrengthTests.swift in Sources */,
+				5B7B75F3309D4F02007D2F91 /* DeckTests.swift in Sources */,
 				5B5A1E6530953373007D2F91 /* RulesCharacterizationTests.swift in Sources */,
 				5B5A1E803095C771007D2F91 /* AIStrategyTests.swift in Sources */,
 				AAAA00000000000000000001 /* AudioPlayerManagerTests.swift in Sources */,

@@ -48,24 +48,25 @@ enum LevelSimulation {
 }
 
 final class LevelStrengthTests: XCTestCase {
-    /// Characterization of the hand-written hands PR 3 replaces. It records the win
-    /// rates (see the print lines, copied into the PR description) and only checks
-    /// that every game finishes; the numbers are a snapshot, not a contract.
-    func testOldHands_recordTheWinRateAtEachLevel() {
-        let model = PlayerPiecesModel()
-        let levelHands = [model.level1Pieces, model.level2Pieces, model.level3Pieces,
-                          model.level4Pieces, model.level5Pieces, model.level6Pieces]
-        for squares in [false, true] {
-            for level in 1...6 {
-                // The app gave both hands the placeholder elements whenever squares were on.
-                let player = squares ? PlaceholderElements.assign(to: model.player1PiecesForEachDifficulty[level - 1]) : model.player1PiecesForEachDifficulty[level - 1]
-                let opponent = squares ? PlaceholderElements.assign(to: levelHands[level - 1]) : levelHands[level - 1]
+    /// The difficulty ladder. The reference player (look-ahead, player 1) holds the
+    /// starter deck at EVERY level and plays 2-square boards with the computer moving
+    /// first; the opponent holds that level's deck. A level may be no easier than the
+    /// one before it, but levels may tie: with the starter deck, levels 5 and 6 can
+    /// both be near zero. The same seeded layouts are used at every level.
+    func testLadder_winRateNeverIncreasesAsTheLevelRises() {
+        let player = Deck.starter.stones(owner: 1)
+        var rates: [Double] = []
+        for level in 1...6 {
+            let opponent = OpponentDecks.deck(forLevel: level).stones(owner: 2)
 
-                let record = LevelSimulation.record(playerHand: player, opponentHand: opponent, level: level, squares: squares, games: 300)
+            let record = LevelSimulation.record(playerHand: player, opponentHand: opponent, level: level, squares: true, games: 300)
 
-                print("LEVELSTRENGTH old hands, \(squares ? "2 squares" : "plain board"), level \(level): wins \(record.wins), ties \(record.ties), losses \(record.losses), win rate \(Int((record.winRate * 100).rounded()))%")
-                XCTAssertEqual(record.games, 300)
-            }
+            print("LEVELSTRENGTH new decks (starter deck vs level deck), 2 squares, level \(level): wins \(record.wins), ties \(record.ties), losses \(record.losses), win rate \(Int((record.winRate * 100).rounded()))%")
+            XCTAssertEqual(record.games, 300)
+            rates.append(record.winRate)
+        }
+        for level in 1..<6 {
+            XCTAssertLessThanOrEqual(rates[level], rates[level - 1], "level \(level + 1) is easier than level \(level)")
         }
     }
 }
