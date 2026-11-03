@@ -80,7 +80,7 @@ class GameViewModel: ObservableObject {
 
     init(persistence: PersistenceStore = UserDefaultsPersistenceStore(), analytics: AnalyticsService = ConsoleAnalyticsService()) {
         let piecesModel = PlayerPiecesModel()
-        self.gameState = GameState(player1Hand: piecesModel.player1Pieces, player2Hand: piecesModel.player2Pieces, startingPlayer: startingPlayer)
+        self.gameState = Self.newGameState(player1Hand: piecesModel.player1Pieces, player2Hand: piecesModel.player2Pieces, startingPlayer: startingPlayer)
         self.level1Pieces = piecesModel.level1Pieces
         self.level2Pieces = piecesModel.level2Pieces
         self.level3Pieces = piecesModel.level3Pieces
@@ -95,6 +95,19 @@ class GameViewModel: ObservableObject {
     }
     
     var selectedDifficulty: Int = 1
+    
+    private static let elementalSquareCount = 3
+    
+    /// A fresh game: placeholder elements on the hands and a new random scatter of
+    /// elemental squares. Static so init can call it before every property is set.
+    private static func newGameState(player1Hand: [Stone], player2Hand: [Stone], startingPlayer: Int) -> GameState {
+        var state = GameState(player1Hand: PlaceholderElements.assign(to: player1Hand),
+                              player2Hand: PlaceholderElements.assign(to: player2Hand),
+                              startingPlayer: startingPlayer)
+        var generator = SystemRandomNumberGenerator()
+        state.cellElements = BoardGenerator.elementalSquares(count: elementalSquareCount, using: &generator)
+        return state
+    }
     
     /// Difficulty is always 1-6 in practice (the picker that drives it only offers
     /// those values), but Int isn't exhaustively switchable, so `default` falls
@@ -114,7 +127,9 @@ class GameViewModel: ObservableObject {
     func setupComputerDifficulty(_ level: Int) {
         selectedDifficulty = level
         analytics.track(event: "game_started", properties: ["mode": "pvc", "difficulty": level])
-        (player2Pieces, player1Pieces) = pieces(forDifficulty: level)
+        let hands = pieces(forDifficulty: level)
+        player2Pieces = PlaceholderElements.assign(to: hands.computer)
+        player1Pieces = PlaceholderElements.assign(to: hands.player1)
         isPlayingComputer = true
         requestComputerMoveIfDue()
     }
@@ -186,7 +201,7 @@ class GameViewModel: ObservableObject {
             player1Hand = pvpPlayer1Hand
             player2Hand = pvpPlayer2Hand
         }
-        gameState = GameState(player1Hand: player1Hand, player2Hand: player2Hand, startingPlayer: startingPlayer)
+        gameState = Self.newGameState(player1Hand: player1Hand, player2Hand: player2Hand, startingPlayer: startingPlayer)
         isGameOver = false
         winner = nil
         requestComputerMoveIfDue()
