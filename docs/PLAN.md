@@ -202,6 +202,7 @@ Decisions for this phase:
 - 36 tiles: 4 tiers (common, uncommon, rare, epic) x 9, each tier with 2 tiles per element and 1 plain tile. Each tile can be owned once; the collection is a set of tile ids, and rewards and the shop never offer an owned tile
 - Edges run 1 to 9. Elemental tiles have a fixed edge sum per tier (12, 16, 20, 24) and plain tiles get 1 more, because a plain tile breaks on every square. The tests use an element-aware dominance check
 - Decks are exactly 5 tiles, with no drawing from a larger deck, so hands stay visible and exact AI search stays possible
+- Opponent decks are explicit tile-id lists per level (not a pick-the-first-N rule, so regenerating the tile set cannot silently change them). Every opponent deck covers at least 3 of the 4 elements, the starter deck covers all 4, deck totals stay stable because sums are fixed per tier, and a test checks that every id in every deck still resolves. PvP uses the starter deck for both players
 - The old hand-written hands and `PlaceholderElements` go away when hands come from the tile set. The player has no per-level hands any more: only opponents have decks, defined per level now and per campaign node later (see "Journey design" in Phase 5)
 - `scripts/generate_tiles.py` (fixed seed) writes `Models/TileSet.swift`; rerun it and the TileSetTests after any budget change
 
@@ -227,20 +228,25 @@ Done when a new player can beat the first NPC, earn a tile, spend gold, quit the
 
 The game is a journey. The player grows a collection and a deck from a small start, and the campaign is how they grow it.
 
-- The player starts with a starter collection and a starter deck: commons only, covering all four elements so elemental squares are playable
+- The player starts with a starter collection and a starter deck: commons only, no plain tiles. The starter collection is the 8 elemental commons (2 per element) and the default deck is 5 of them covering all four elements, so elemental squares are playable and the player has real deck choices from the start. The plain common becomes a reward or shop tile later
 - There are no per-level hands for the player. In PvC the player's hand is always their active deck. Only opponents have decks: defined per level now, per campaign node later
 - The first nodes are a guided tutorial with scripted boards (fixed hands and fixed square layouts). Node 1 teaches capture, node 2 an elemental square, and a later node blocks
 - A win earns gold, and a first win also earns the node's reward tile. A shop sells tiles for gold at fixed prices by rarity, and higher-rarity stock unlocks chapter by chapter
 - The deck builder and the shop unlock progressively as the player advances
 - PvP is separate from progression: both players use the same standard deck
 - Free play (any AI level, with the active deck) stays available after the campaign
-- Every node must be beatable with the collection a player plausibly owns at that point. A winnability check in the test suite enforces this (see the PR 3 report for the method)
+- Every node must be beatable with the collection a player plausibly owns at that point. The winnability check:
+  - Plausible collection at a node: the starter collection plus the reward tiles of earlier nodes (the floor, no shop), and a second case that adds tiles the player could afford in the shop
+  - Normal nodes: a reference player with the best deck from that collection must win at least 70% (a starting value, to be tuned) of seeded games against that node's actual AI, with random square layouts and the computer moving first. A forced win against a perfect opponent is not required of a fair node
+  - Scripted tutorial nodes: a forced win for the player, checked by exhaustive search
+  - A difficulty-ladder test: with a fixed deck, win rate falls as the level rises. A replay of a cleared node always pays gold above zero
+  - Cost: report the runtime of the exact search and the 300-game checks before wiring them into CI. Keep per-PR CI fast: a small seeded smoke subset runs in the normal suite, and the full run is a separate command or scheduled job
 
 PR sequence for Phases 4 and 5, a thin vertical slice first. Each PR leaves the app playable, and a short plan comes first for the screens and for any PR that touches more than a few files:
 
 1. Merged: `Tile`, rarity budget and generated tile set (#8)
-2. Hands from decks: the player's hand is the active deck, fixed opponent decks per level from the pool, a standard PvP deck, and a difficulty-ladder test. Removes `PlayerPiecesModel` and `PlaceholderElements`
-3. Basic deck builder: pick 5 tiles from the owned collection; everything is owned for now, held in memory
+2. Hands from decks (merged back to back with step 3; nothing ships in between): the player's hand is the active deck, fixed opponent decks per level from the pool, a standard PvP deck, and a difficulty-ladder test. Removes `PlayerPiecesModel` and `PlaceholderElements`
+3. Basic deck builder: pick 5 tiles from the owned collection; every tile is owned until step 6 flips the starting collection, held in memory
 4. Player profile and saving: owned tile ids, active deck, gold, cleared nodes and unlock flags, in one `Codable` value behind `PersistenceStore`
 5. Scripted matches and the result screen: a `MatchSetup` with fixed hands, fixed square layouts and the starting player, plus a result screen with Play again and Back to map. Fixes the dead end after a PvC game
 6. Campaign data and a short map (the tutorial nodes plus the six AI levels), first-win reward tiles and gold; this PR switches the starting collection from everything owned to the starter collection, and adds the winnability check. This is the riskiest step: a mistuned economy can leave a new player unable to progress
