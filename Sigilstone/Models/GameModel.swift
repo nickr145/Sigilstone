@@ -15,6 +15,9 @@ struct Stone: Identifiable, Equatable {
     var left: Int
     var owner: Int
     var element: Element? = nil
+    /// The collectible tile this stone was made from, if any. Stable across launches,
+    /// unlike `id`, which is new for every Stone.
+    var tileID: String? = nil
 
     func canCapture(_ adjacentStone: Stone, direction: Direction) -> Bool {
         switch direction {
