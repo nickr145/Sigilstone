@@ -44,6 +44,7 @@
 		5B7B75EB3099886C00ABE62B /* PlaceholderElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75EA3099886300ABE62B /* PlaceholderElements.swift */; };
 		5B7B75ED309988B000ABE62B /* BoardGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75EC309988B000ABE62B /* BoardGeneratorTests.swift */; };
 		5B7B75F1309B2D02007D2F91 /* TileSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75F1309B2D01007D2F91 /* TileSetTests.swift */; };
+		5B7B75F2309C3E02007D2F91 /* LevelStrengthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75F2309C3E01007D2F91 /* LevelStrengthTests.swift */; };
 		5B7B75F0309A1C02007D2F91 /* ElementStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75F0309A1C01007D2F91 /* ElementStyle.swift */; };
 		5B7B75F0309A1C04007D2F91 /* BlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7B75F0309A1C03007D2F91 /* BlockView.swift */; };
 		5B87817E2CEB19E1001B041B /* GameStringConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B87817D2CEB19E1001B041B /* GameStringConstants.swift */; };
@@ -110,6 +111,7 @@
 		5B7B75EA3099886300ABE62B /* PlaceholderElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderElements.swift; sourceTree = "<group>"; };
 		5B7B75EC309988B000ABE62B /* BoardGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardGeneratorTests.swift; sourceTree = "<group>"; };
 		5B7B75F1309B2D01007D2F91 /* TileSetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileSetTests.swift; sourceTree = "<group>"; };
+		5B7B75F2309C3E01007D2F91 /* LevelStrengthTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelStrengthTests.swift; sourceTree = "<group>"; };
 		5B7B75F0309A1C01007D2F91 /* ElementStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElementStyle.swift; sourceTree = "<group>"; };
 		5B7B75F0309A1C03007D2F91 /* BlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockView.swift; sourceTree = "<group>"; };
 		5B87817D2CEB19E1001B041B /* GameStringConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStringConstants.swift; sourceTree = "<group>"; };
@@ -267,6 +269,7 @@
 				5B5A1E7F3095C771007D2F91 /* AIStrategyTests.swift */,
 				5B7B75EC309988B000ABE62B /* BoardGeneratorTests.swift */,
 				5B7B75F1309B2D01007D2F91 /* TileSetTests.swift */,
+				5B7B75F2309C3E01007D2F91 /* LevelStrengthTests.swift */,
 			);
 			path = SigilstoneTests;
 			sourceTree = "<group>";
@@ -434,6 +437,7 @@
 				5B5A1E7A30958A3F007D2F91 /* GameRulesTests.swift in Sources */,
 				5B7B75ED309988B000ABE62B /* BoardGeneratorTests.swift in Sources */,
 				5B7B75F1309B2D02007D2F91 /* TileSetTests.swift in Sources */,
+				5B7B75F2309C3E02007D2F91 /* LevelStrengthTests.swift in Sources */,
 				5B5A1E6530953373007D2F91 /* RulesCharacterizationTests.swift in Sources */,
 				5B5A1E803095C771007D2F91 /* AIStrategyTests.swift in Sources */,
 				AAAA00000000000000000001 /* AudioPlayerManagerTests.swift in Sources */,
