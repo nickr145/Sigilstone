@@ -96,6 +96,23 @@ class GameViewModel: ObservableObject {
     
     var selectedDifficulty: Int = 1
     
+    /// The most elemental squares a new game may get. 0 keeps boards plain, so unit
+    /// tests stay deterministic; the game screens set it to 2.
+    var maxElementalSquares = 0
+    
+    /// A random layout of 1 to `maxElementalSquares` squares, or all plain when the max is 0.
+    private func newSquares() -> [Element?] {
+        guard maxElementalSquares > 0 else { return Array(repeating: nil, count: BoardGeometry.cellCount) }
+        var generator = SystemRandomNumberGenerator()
+        let count = Int.random(in: 1...maxElementalSquares, using: &generator)
+        return BoardGenerator.elementalSquares(count: count, using: &generator)
+    }
+    
+    /// Placeholder elements on a hand, only when squares are on.
+    private func withElements(_ hand: [Stone]) -> [Stone] {
+        maxElementalSquares > 0 ? PlaceholderElements.assign(to: hand) : hand
+    }
+    
     /// Difficulty is always 1-6 in practice (the picker that drives it only offers
     /// those values), but Int isn't exhaustively switchable, so `default` falls
     /// back to level 1 rather than being duplicated across every caller.
@@ -114,7 +131,10 @@ class GameViewModel: ObservableObject {
     func setupComputerDifficulty(_ level: Int) {
         selectedDifficulty = level
         analytics.track(event: "game_started", properties: ["mode": "pvc", "difficulty": level])
-        (player2Pieces, player1Pieces) = pieces(forDifficulty: level)
+        let hands = pieces(forDifficulty: level)
+        player2Pieces = withElements(hands.computer)
+        player1Pieces = withElements(hands.player1)
+        gameState.cellElements = newSquares()
         isPlayingComputer = true
         requestComputerMoveIfDue()
     }
@@ -186,7 +206,8 @@ class GameViewModel: ObservableObject {
             player1Hand = pvpPlayer1Hand
             player2Hand = pvpPlayer2Hand
         }
-        gameState = GameState(player1Hand: player1Hand, player2Hand: player2Hand, startingPlayer: startingPlayer)
+        gameState = GameState(player1Hand: withElements(player1Hand), player2Hand: withElements(player2Hand), startingPlayer: startingPlayer)
+        gameState.cellElements = newSquares()
         isGameOver = false
         winner = nil
         requestComputerMoveIfDue()

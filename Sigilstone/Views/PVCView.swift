@@ -79,6 +79,7 @@ struct PVCView: View {
             buttonVstack
         }
         .onAppear {
+            viewModel.maxElementalSquares = 2
             viewModel.setupComputerDifficulty(difficulty)
             audioManager.playAudio(named: viewModel.musicDifficultyStrings.indices.contains(difficulty - 1) ? viewModel.musicDifficultyStrings[difficulty - 1] : nil)
         }

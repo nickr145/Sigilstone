@@ -61,8 +61,10 @@ struct GameBoardView: View {
                 Group {
                     if let stone = viewModel.board[index] {
                         StoneView(stone: stone)
+                    } else if viewModel.gameState.blocks.contains(index) {
+                        BlockView(index: index)
                     } else {
-                        EmptyCellView(index: index, onTap: {
+                        EmptyCellView(index: index, element: viewModel.gameState.cellElements[index], onTap: {
                             guard !viewModel.isAITurnPending, viewModel.selectedPiece != nil else { return }
                             viewModel.placeSelectedPiece(at: index)
                         })

@@ -76,7 +76,8 @@ final class GameViewModelTests: XCTestCase {
                 viewModel.performComputerMove()
             } else {
                 viewModel.selectedPiece = viewModel.player1Pieces[0]
-                _ = viewModel.placeSelectedPiece(at: viewModel.board.firstIndex { $0 == nil }!)
+                // emptyCells, not the first nil board cell: that can be a block.
+                _ = viewModel.placeSelectedPiece(at: viewModel.gameState.emptyCells.first!)
             }
             moves += 1
         }
@@ -172,17 +173,27 @@ final class GameViewModelTests: XCTestCase {
     
     // MARK: - PvP reset
     
+    /// Plays a PvP game to the end: whoever's turn it is places their first stone in the
+    /// first empty cell. Capped, so a rejected move fails the test instead of hanging it.
+    private func playFullPVPGame(_ viewModel: GameViewModel, file: StaticString = #filePath, line: UInt = #line) {
+        var moves = 0
+        while !viewModel.isGameOver && moves < 20 {
+            let hand = viewModel.currentPlayer == 1 ? viewModel.player1Pieces : viewModel.player2Pieces
+            viewModel.selectedPiece = hand[0]
+            XCTAssertTrue(viewModel.placeSelectedPiece(at: viewModel.gameState.emptyCells.first!), file: file, line: line)
+            moves += 1
+        }
+        XCTAssertTrue(viewModel.isGameOver, "game did not finish within the move cap", file: file, line: line)
+    }
+    
+    
     func testPvpReset_refillsTheOriginalHands() {
         let viewModel = GameViewModel(persistence: InMemoryPersistenceStore(), analytics: SpyAnalyticsService())
         let startingHand1 = viewModel.player1Pieces
         let startingHand2 = viewModel.player2Pieces
         
         // Play a PvP game to the end: whoever's turn it is places their first stone in the first empty cell
-        while !viewModel.isGameOver {
-            let hand = viewModel.currentPlayer == 1 ? viewModel.player1Pieces : viewModel.player2Pieces
-            viewModel.selectedPiece = hand[0]
-            XCTAssertTrue(viewModel.placeSelectedPiece(at: viewModel.board.firstIndex { $0 == nil }!))
-        }
+        playFullPVPGame(viewModel)
         
         viewModel.resetGame()
         
@@ -190,17 +201,91 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.player2Pieces, startingHand2, "player 2 should get the PvP starting hand again")
     }
     
+    // MARK: - Elemental squares
+
+    private func squareCount(_ viewModel: GameViewModel) -> Int {
+        viewModel.gameState.cellElements.compactMap { $0 }.count
+    }
+
+    func testGames_arePlainByDefault() {
+        let viewModel = makePVCViewModel()
+
+        XCTAssertEqual(squareCount(viewModel), 0)
+        XCTAssertTrue((viewModel.player1Pieces + viewModel.player2Pieces).allSatisfy { $0.element == nil })
+
+        viewModel.resetGame()
+
+        XCTAssertEqual(squareCount(viewModel), 0)
+        XCTAssertTrue((viewModel.player1Pieces + viewModel.player2Pieces).allSatisfy { $0.element == nil })
+    }
+
+    func testPvcSetup_withSquaresOn_scattersSquaresAndElementsTheHands() {
+        let viewModel = GameViewModel(persistence: InMemoryPersistenceStore(), analytics: SpyAnalyticsService())
+        viewModel.maxElementalSquares = 2
+
+        viewModel.setupComputerDifficulty(3)
+
+        XCTAssertTrue((1...2).contains(squareCount(viewModel)))
+        XCTAssertTrue(viewModel.gameState.blocks.isEmpty)
+        XCTAssertEqual(viewModel.player1Pieces.map(\.element), [.fire, .water, .earth, .air, nil])
+        XCTAssertEqual(viewModel.player2Pieces.map(\.element), [.fire, .water, .earth, .air, nil])
+    }
+
+    func testResetGame_withSquaresOn_makesANewLayoutOfOneOrTwoSquaresEachTime() {
+        let viewModel = GameViewModel(persistence: InMemoryPersistenceStore(), analytics: SpyAnalyticsService())
+        viewModel.maxElementalSquares = 2
+        viewModel.setupComputerDifficulty(2)
+
+        var layouts: Set<[Element?]> = []
+        for _ in 0..<20 {
+            viewModel.resetGame()
+            XCTAssertTrue((1...2).contains(squareCount(viewModel)))
+            XCTAssertTrue(viewModel.gameState.blocks.isEmpty)
+            XCTAssertTrue(viewModel.board.allSatisfy { $0 == nil })
+            layouts.insert(viewModel.gameState.cellElements)
+        }
+
+        XCTAssertGreaterThan(layouts.count, 1, "twenty resets should not all produce the same layout")
+    }
+
+    func testPvpReset_withSquaresOn_scattersSquaresAndKeepsTheOriginalStones() {
+        let viewModel = GameViewModel(persistence: InMemoryPersistenceStore(), analytics: SpyAnalyticsService())
+        let startingIDs1 = viewModel.player1Pieces.map(\.id)
+        let startingIDs2 = viewModel.player2Pieces.map(\.id)
+        viewModel.maxElementalSquares = 2
+
+        viewModel.resetGame()
+
+        XCTAssertTrue((1...2).contains(squareCount(viewModel)))
+        XCTAssertEqual(viewModel.player1Pieces.map(\.id), startingIDs1)
+        XCTAssertEqual(viewModel.player2Pieces.map(\.id), startingIDs2)
+        XCTAssertEqual(viewModel.player1Pieces.map(\.element), [.fire, .water, .earth, .air, nil])
+        XCTAssertEqual(viewModel.player2Pieces.map(\.element), [.fire, .water, .earth, .air, nil])
+    }
+
+    func testFullPvcGames_withSquaresOn_alwaysFillTheBoardWithStonesAndBlocks() {
+        for level in 1...6 {
+            for game in 1...10 {
+                let viewModel = GameViewModel(persistence: InMemoryPersistenceStore(), analytics: SpyAnalyticsService())
+                viewModel.maxElementalSquares = 2
+                viewModel.setupComputerDifficulty(level)
+
+                playFullPVCGame(viewModel)
+
+                XCTAssertTrue(viewModel.isGameOver, "level \(level) game \(game)")
+                let stones = viewModel.board.compactMap { $0 }.count
+                XCTAssertEqual(stones + viewModel.gameState.blocks.count, 9, "level \(level) game \(game)")
+            }
+        }
+    }
+
     // MARK: - Stats and analytics are PvC-only
     func testPvpGame_isNotRecordedInStatsOrAnalytics() {
         let store = InMemoryPersistenceStore()
         let spy = SpyAnalyticsService()
         let viewModel = GameViewModel(persistence: store, analytics: spy)
         
-        while !viewModel.isGameOver {
-            let hand = viewModel.currentPlayer == 1 ? viewModel.player1Pieces : viewModel.player2Pieces
-            viewModel.selectedPiece = hand[0]
-            XCTAssertTrue(viewModel.placeSelectedPiece(at: viewModel.board.firstIndex { $0 == nil }!))
-        }
+        playFullPVPGame(viewModel)
         
         XCTAssertEqual(store.loadStats().gamesPlayed, 0, "PvP games don't count toward stats")
         XCTAssertFalse(spy.trackedEvents.contains { $0.event == "game_ended" })
