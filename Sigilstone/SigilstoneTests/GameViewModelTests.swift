@@ -173,17 +173,27 @@ final class GameViewModelTests: XCTestCase {
     
     // MARK: - PvP reset
     
+    /// Plays a PvP game to the end: whoever's turn it is places their first stone in the
+    /// first empty cell. Capped, so a rejected move fails the test instead of hanging it.
+    private func playFullPVPGame(_ viewModel: GameViewModel, file: StaticString = #filePath, line: UInt = #line) {
+        var moves = 0
+        while !viewModel.isGameOver && moves < 20 {
+            let hand = viewModel.currentPlayer == 1 ? viewModel.player1Pieces : viewModel.player2Pieces
+            viewModel.selectedPiece = hand[0]
+            XCTAssertTrue(viewModel.placeSelectedPiece(at: viewModel.gameState.emptyCells.first!), file: file, line: line)
+            moves += 1
+        }
+        XCTAssertTrue(viewModel.isGameOver, "game did not finish within the move cap", file: file, line: line)
+    }
+    
+    
     func testPvpReset_refillsTheOriginalHands() {
         let viewModel = GameViewModel(persistence: InMemoryPersistenceStore(), analytics: SpyAnalyticsService())
         let startingHand1 = viewModel.player1Pieces
         let startingHand2 = viewModel.player2Pieces
         
         // Play a PvP game to the end: whoever's turn it is places their first stone in the first empty cell
-        while !viewModel.isGameOver {
-            let hand = viewModel.currentPlayer == 1 ? viewModel.player1Pieces : viewModel.player2Pieces
-            viewModel.selectedPiece = hand[0]
-            XCTAssertTrue(viewModel.placeSelectedPiece(at: viewModel.board.firstIndex { $0 == nil }!))
-        }
+        playFullPVPGame(viewModel)
         
         viewModel.resetGame()
         
@@ -275,11 +285,7 @@ final class GameViewModelTests: XCTestCase {
         let spy = SpyAnalyticsService()
         let viewModel = GameViewModel(persistence: store, analytics: spy)
         
-        while !viewModel.isGameOver {
-            let hand = viewModel.currentPlayer == 1 ? viewModel.player1Pieces : viewModel.player2Pieces
-            viewModel.selectedPiece = hand[0]
-            XCTAssertTrue(viewModel.placeSelectedPiece(at: viewModel.board.firstIndex { $0 == nil }!))
-        }
+        playFullPVPGame(viewModel)
         
         XCTAssertEqual(store.loadStats().gamesPlayed, 0, "PvP games don't count toward stats")
         XCTAssertFalse(spy.trackedEvents.contains { $0.event == "game_ended" })
