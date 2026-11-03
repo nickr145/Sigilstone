@@ -24,8 +24,8 @@ This section is the brief for taking over the project. Read it first, then the p
 
 - Phase 1 (rebrand and IP cleanup) is done: no borrowed art, audio or names remain, and the work lives in a fresh private repo
 - Phase 2 (rules engine) is done, including the AI as strategies behind one protocol
-- Phase 3 (elemental squares and blocks) has its engine work merged in three PRs, and `main` has 82 passing tests. PR 4, which puts squares on screen, is in progress; its spec is in the Phase 3 section
-- Next, in order: finish PR 4, then Phases 4 to 8 as laid out below. The pre-match display of elemental squares and fixed layouts per campaign node belong to Phase 5
+- Phase 3 (elemental squares and blocks) has its engine work merged in three PRs, and `main` has 82 passing tests. PR 4, which puts squares on screen, is open as #7 with 91 passing tests, waiting for the owner's manual checks and merge
+- Next, in order: merge PR 4, then Phases 4 to 8 as laid out below. The pre-match display of elemental squares and fixed layouts per campaign node belong to Phase 5
 
 ### How to work
 
@@ -145,13 +145,19 @@ Add the two missing rules once the engine is tested: a stone placed on a mismatc
 - [x] Add an `Element` enum, an optional element per board cell and an optional element per tile
 - [x] Mismatch rule: the stone breaks and the cell becomes a block
 - [x] Blocks cannot be played on, cannot be owned and do not count toward the final score
-- [ ] Board generator: 1 to 2 elemental squares per match so boards stay fair (the generator is written; PR 4 wires it into new games)
-- [ ] Show elemental squares before the match starts, using a symbol as well as a color (PR 4 draws them on the board with a symbol and a color; showing them before the match starts moves to the Phase 5 pre-match screen)
+- [x] Board generator: 1 to 2 elemental squares per match so boards stay fair
+- [x] Show elemental squares on the board, using a symbol as well as a color (showing them before the match starts moves to the Phase 5 pre-match screen)
 - [x] Update win and tie logic for boards with fewer scoring tiles
 - [x] Teach the AI to weigh breakage risk when it picks a cell
 - [x] Tests for breaking, blocked cells, scoring with blocks and a board that fills with blocks
 
 Done when a full match with elements and blocks plays correctly against all six AI levels.
+
+Status: code complete on November 2, 2026; PR 4 (#7) is open and waits for the owner's manual checks and merge.
+
+- Squares and blocks are drawn on the board in PvC and PvP, with a symbol and a color per element, and 60 full PvC games with squares on (levels 1 to 6) end with stones plus blocks equal to 9
+- `GameViewModel.maxElementalSquares` defaults to 0, so unit tests use plain boards; the two game screens set it to 2
+- The suite is at 91 tests. The committed branch before PR 4 always placed 3 random squares, which could hang two PvP tests that looped on the first nil cell; the plain default fixed it
 
 Rules decided:
 
@@ -160,12 +166,12 @@ Rules decided:
 - Blocks make ties possible; a tie is a draw with no reward, and the player retries
 - Elemental squares are fixed per campaign node and random in free play
 
-Plan, one small PR each so the app works after every step. PRs 1 to 3 are merged and PR 4 is in progress:
+Plan, one small PR each so the app works after every step. PRs 1 to 3 are merged and PR 4 is open (#7) and waiting for the owner's review and manual checks:
 
 - Merged, PR 1: the data model. `Element`, a stone's element, per-cell elements and a set of blocked cells on `GameState`; blocked cells are not empty and are not legal moves
 - Merged, PR 2: the break rule in `GameRules.apply`, with `GameRules.breaks`
 - Merged, PR 3: AI levels 3 to 6 evaluate moves through `GameRules`, so they see breakage; levels 1 and 2 stay naive on purpose
-- In progress, PR 4: board generator and the UI, on branch `feature/elemental-squares-on-screen`
+- Open, PR 4: board generator and the UI, on branch `feature/elemental-squares-on-screen`
 
 PR 4, what is left. The owner has already written `Engine/BoardGenerator.swift` (`BoardGenerator.elementalSquares(count:using:)`), `Models/PlaceholderElements.swift` (`PlaceholderElements.assign(to:)` gives the first four stones of a hand fire, water, earth and air and leaves the fifth neutral, until Phase 4's tile set replaces it) and `BoardGeneratorTests`. Check that with `git status` and the test count (86), then finish the rest:
 
