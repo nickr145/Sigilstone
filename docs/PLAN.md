@@ -24,8 +24,9 @@ This section is the brief for taking over the project. Read it first, then the p
 
 - Phase 1 (rebrand and IP cleanup) is done: no borrowed art, audio or names remain, and the work lives in a fresh private repo
 - Phase 2 (rules engine) is done, including the AI as strategies behind one protocol
-- Phase 3 (elemental squares and blocks) has its engine work merged in three PRs, and `main` has 82 passing tests. PR 4, which puts squares on screen, is open as #7 with 91 passing tests, waiting for the owner's manual checks and merge
-- Next, in order: merge PR 4, then Phases 4 to 8 as laid out below. The pre-match display of elemental squares and fixed layouts per campaign node belong to Phase 5
+- Phase 3 (elemental squares and blocks) is done: the engine work and the on-screen squares and blocks are merged
+- Phase 4 has started: the `Tile` model, rarity budget and generated 36-tile set are merged (PR #8), and `main` has 100 passing tests. Nothing in the game uses the tiles yet
+- Next, in order: the Phase 4 and 5 vertical slice listed under "Journey design" in Phase 5, then Phases 6 to 8. The pre-match display of elemental squares and fixed layouts per campaign node belong to Phase 5
 
 ### How to work
 
@@ -189,10 +190,10 @@ Letting the player choose tiles from a collection turns each opponent from a rep
 - [x] Define a `Tile` model: id, four edge values, optional element, rarity
 - [x] Set a stat budget per rarity tier (one fixed edge sum per tier) so no tile strictly beats another in its tier
 - [x] Generate the tile set with a script instead of by hand: 36 tiles at launch
+- [ ] Hands come from decks: the player's hand is their active deck, each AI level has a fixed deck from the tile pool, and PvP uses one standard deck for both players
+- [ ] Deck builder: pick 5 tiles from the owned collection (first version over the whole pool; one saved deck, then more than one)
 - [ ] Collection screen: grid view, filters by rarity and element, silhouettes for tiles not yet owned
-- [ ] Deck builder: pick a fixed number of tiles, save more than one deck
-- [ ] Give each opponent a deck drawn from the same tile pool
-- [ ] Turn order: coin flip by default instead of the opponent always going first
+- [ ] Turn order: coin flip in free play (campaign nodes set their own starting player)
 
 Done when a player can build a deck, enter a match with it and see the opponent use tiles from the same pool.
 
@@ -201,12 +202,12 @@ Decisions for this phase:
 - 36 tiles: 4 tiers (common, uncommon, rare, epic) x 9, each tier with 2 tiles per element and 1 plain tile. Each tile can be owned once; the collection is a set of tile ids, and rewards and the shop never offer an owned tile
 - Edges run 1 to 9. Elemental tiles have a fixed edge sum per tier (12, 16, 20, 24) and plain tiles get 1 more, because a plain tile breaks on every square. The tests use an element-aware dominance check
 - Decks are exactly 5 tiles, with no drawing from a larger deck, so hands stay visible and exact AI search stays possible
-- The old hand-written hands and `PlaceholderElements` go away when hands come from the tile set; turn order becomes a coin flip as the last PR of the phase
+- The old hand-written hands and `PlaceholderElements` go away when hands come from the tile set. The player has no per-level hands any more: only opponents have decks, defined per level now and per campaign node later (see "Journey design" in Phase 5)
 - `scripts/generate_tiles.py` (fixed seed) writes `Models/TileSet.swift`; rerun it and the TileSetTests after any budget change
 
-Order of work: (1) Tile model and generated set, (2) hands from the pool, (3) collection and deck persistence, (4) collection screen, (5) deck builder, (6) coin flip. A short plan comes first for the two screens.
+Order of work: the PR sequence under "Journey design" in Phase 5 replaces the earlier order. It builds a thin vertical slice first (decks, a basic deck builder, saving, scripted matches, a short map, gold, a basic shop) and polishes the collection grid, multiple decks and the coin flip afterwards. A short plan comes first for each screen.
 
-Status: PR 1 (`Tile`, rarity budget, generated set) is open; the rest is not started.
+Status: the `Tile` model, rarity budget and generated set are merged (#8). Next is PR 3, hands from decks, which starts with a report and plan for the owner's approval.
 
 ## Phase 5: Campaign map, NPC progression, rewards and shop
 
@@ -221,6 +222,34 @@ Progression gives the player a reason to come back: a first win against an NPC u
 - [ ] Pick a business model: paid app or one-time unlock; if you ever add randomized packs, Apple requires odds disclosure
 
 Done when a new player can beat the first NPC, earn a tile, spend gold, quit the app and find everything saved on relaunch.
+
+### Journey design
+
+The game is a journey. The player grows a collection and a deck from a small start, and the campaign is how they grow it.
+
+- The player starts with a starter collection and a starter deck: commons only, covering all four elements so elemental squares are playable
+- There are no per-level hands for the player. In PvC the player's hand is always their active deck. Only opponents have decks: defined per level now, per campaign node later
+- The first nodes are a guided tutorial with scripted boards (fixed hands and fixed square layouts). Node 1 teaches capture, node 2 an elemental square, and a later node blocks
+- A win earns gold, and a first win also earns the node's reward tile. A shop sells tiles for gold at fixed prices by rarity, and higher-rarity stock unlocks chapter by chapter
+- The deck builder and the shop unlock progressively as the player advances
+- PvP is separate from progression: both players use the same standard deck
+- Free play (any AI level, with the active deck) stays available after the campaign
+- Every node must be beatable with the collection a player plausibly owns at that point. A winnability check in the test suite enforces this (see the PR 3 report for the method)
+
+PR sequence for Phases 4 and 5, a thin vertical slice first. Each PR leaves the app playable, and a short plan comes first for the screens and for any PR that touches more than a few files:
+
+1. Merged: `Tile`, rarity budget and generated tile set (#8)
+2. Hands from decks: the player's hand is the active deck, fixed opponent decks per level from the pool, a standard PvP deck, and a difficulty-ladder test. Removes `PlayerPiecesModel` and `PlaceholderElements`
+3. Basic deck builder: pick 5 tiles from the owned collection; everything is owned for now, held in memory
+4. Player profile and saving: owned tile ids, active deck, gold, cleared nodes and unlock flags, in one `Codable` value behind `PersistenceStore`
+5. Scripted matches and the result screen: a `MatchSetup` with fixed hands, fixed square layouts and the starting player, plus a result screen with Play again and Back to map. Fixes the dead end after a PvC game
+6. Campaign data and a short map (the tutorial nodes plus the six AI levels), first-win reward tiles and gold; this PR switches the starting collection from everything owned to the starter collection, and adds the winnability check. This is the riskiest step: a mistuned economy can leave a new player unable to progress
+7. Basic shop: fixed prices by rarity, chapter-gated stock, never offers an owned tile, unlocks after a set node
+8. Collection screen: grid, filters by rarity and element, silhouettes for unowned tiles
+9. More than one saved deck
+10. Stars (rules kept in one place), chapters and boss nodes
+11. Coin flip in free play, with tests for both starting players through the `computerTurnToken` path
+12. v1 map art
 
 ### Campaign map
 
