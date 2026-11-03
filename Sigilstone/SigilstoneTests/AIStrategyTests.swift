@@ -49,12 +49,75 @@ enum TestPositions {
 
 final class AIStrategyTests: XCTestCase {
 
-    private func stone(_ top: Int, _ right: Int, _ bottom: Int, _ left: Int, owner: Int) -> Stone {
-        Stone(top: top, right: right, bottom: bottom, left: left, owner: owner)
+    private func stone(_ top: Int, _ right: Int, _ bottom: Int, _ left: Int, owner: Int, element: Element? = nil) -> Stone {
+        Stone(top: top, right: right, bottom: bottom, left: left, owner: owner, element: element)
     }
 
     private func freshState(hand1: [Stone] = [], hand2: [Stone] = []) -> GameState {
         GameState(player1Hand: hand1, player2Hand: hand2, startingPlayer: 2)
+    }
+    
+    // MARK: - Elemental squares
+    
+    func testCaptureFirst_skipsACapturingCellWhereTheStoneWouldBreak() {
+        var rng = SeededGenerator(seed: 1)
+        var state = centerTargetState()
+        state.cellElements[1] = .fire // a neutral stone breaks here
+
+        let move = CaptureFirstStrategy().chooseMove(in: state, using: &rng)
+
+        XCTAssertEqual(move?.cell, 3, "cell 1 would break the stone, so it captures nothing")
+    }
+
+    func testCaptureFirst_whenNothingCaptures_avoidsBreakingIfASafeCellExists() {
+        var rng = SeededGenerator(seed: 2)
+        var state = freshState(hand2: [stone(0, 0, 0, 0, owner: 2), stone(0, 0, 0, 0, owner: 2)])
+        for cell in 0..<9 where cell != 4 { state.cellElements[cell] = .fire }
+
+        for _ in 0..<30 {
+            let move = CaptureFirstStrategy().chooseMove(in: state, using: &rng)
+            XCTAssertEqual(move?.cell, 4, "the only cell where a neutral stone survives")
+        }
+    }
+
+    func testGreedyCapture_scoresABreakingMoveBelowAHarmlessOne() {
+        var rng = SeededGenerator(seed: 1)
+        var state = centerTargetState()
+        state.cellElements[1] = .fire
+
+        let move = GreedyCaptureStrategy().chooseMove(in: state, using: &rng)
+
+        XCTAssertEqual(move?.cell, 3)
+    }
+
+    func testLookAhead_doesNotTakeACaptureThatWouldBreak() {
+        var rng = SeededGenerator(seed: 1)
+        let neutralStrong = stone(5, 5, 5, 5, owner: 2)
+        let weakFire = stone(1, 1, 1, 1, owner: 2, element: .fire)
+        var state = freshState(hand2: [neutralStrong, weakFire])
+        state.board[1] = stone(1, 1, 1, 1, owner: 1)
+        state.cellElements[0] = .fire // neutralStrong would "capture" cell 1 from here, but breaks
+
+        let move = LookAheadStrategy().chooseMove(in: state, using: &rng)
+
+        XCTAssertEqual(move?.cell, 2, "the first real capture; cell 0 would break the stone")
+        XCTAssertEqual(move?.stone.id, neutralStrong.id)
+    }
+
+    func testEveryStrategy_neverPlaysOnABlockedCell() {
+        var rng = SeededGenerator(seed: 11)
+        for level in 1...6 {
+            let strategy = AIStrategies.strategy(forlevel: level)
+            for position in 0..<100 {
+                var state = TestPositions.randomPosition(using: &rng)
+                state.blocks = Set(state.emptyCells.prefix(2))
+                guard let move = strategy.chooseMove(in: state, using: &rng) else {
+                    return XCTFail("level \(level), position \(position): no move")
+                }
+                XCTAssertFalse(state.blocks.contains(move.cell), "level \(level), position \(position)")
+                XCTAssertTrue(GameRules.isLegal(move, in: state), "level \(level), position \(position)")
+            }
+        }
     }
 
     // MARK: - Level 6
@@ -88,10 +151,9 @@ final class AIStrategyTests: XCTestCase {
         // Carried over from the view model's simulateOpponentMove test.
         let candidate = stone(1, 1, 1, 1, owner: 2)
         let opponent = stone(1, 1, 1, 5, owner: 1)
-        let board: [Stone?] = Array(repeating: nil, count: 9)
+        let state = freshState(hand1: [opponent], hand2: [candidate])
 
-        let reply = LookAheadStrategy.worstReply(after: Move(stone: candidate, cell: 4),
-                                                 on: board, opponentHand: [opponent])
+        let reply = LookAheadStrategy.worstReply(after: Move(stone: candidate, cell: 4), in: state)
 
         XCTAssertEqual(reply, 1, "the opponent can capture the candidate from cell 5 (left 5 beats right 1)")
     }

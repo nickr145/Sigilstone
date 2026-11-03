@@ -253,6 +253,18 @@ final class GameRulesTests: XCTestCase {
         XCTAssertFalse(GameRules.breaks(Move(stone: stone(1, 1, 1, 1, owner: 2, element: .water), cell: 0), in: state), "plain cell")
         XCTAssertFalse(GameRules.breaks(Move(stone: stone(1, 1, 1, 1, owner: 2), cell: 9), in: state), "off the board")
     }
+    
+    func testCapturedCells_byMove_isEmptyWhenTheStoneBreaks() {
+        var state = freshState()
+        state.board[1] = stone(1, 1, 1, 1, owner: 1)
+        state.cellElements[4] = .fire
+        let neutral = stone(5, 5, 5, 5, owner: 2)
+        let fire = stone(5, 5, 5, 5, owner: 2, element: .fire)
+
+        XCTAssertEqual(GameRules.capturedCells(by: Move(stone: neutral, cell: 4), in: state), [], "it breaks, so it flips nothing")
+        XCTAssertEqual(GameRules.capturedCells(by: Move(stone: fire, cell: 4), in: state), [1])
+        XCTAssertEqual(GameRules.capturedCells(by: Move(stone: neutral, cell: 0), in: state), [1], "cell 0 is a plain cell")
+    }
 
     // MARK: - Engine vs the view model
 

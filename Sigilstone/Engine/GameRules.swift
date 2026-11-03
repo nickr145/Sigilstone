@@ -42,6 +42,12 @@ enum GameRules {
         return move.stone.element != required
     }
     
+    /// The cells whose stones `move` would flip. A move that breaks flips nothing.
+    static func capturedCells(by move: Move, in state: GameState) -> [Int] {
+        guard !breaks(move, in: state) else { return [] }
+        return CaptureRules.capturedCells(by: move.stone, at: move.cell, on: state.board)
+    }
+    
     /// The state after `move` is played. The caller checks `isLegal` first; this
     /// trusts it. A stone that breaks captures nothing and leaves a block on its
     /// cell. Any other stone captures every neighbor it beats. Either way the stone
