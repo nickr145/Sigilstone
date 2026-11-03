@@ -186,15 +186,27 @@ PR 4, what is left. The owner has already written `Engine/BoardGenerator.swift` 
 
 Letting the player choose tiles from a collection turns each opponent from a repeated puzzle into a game with real decisions. This phase is also where the tile set gets designed, so balance it by rule rather than by feel.
 
-- [ ] Define a `Tile` model: id, four edge values, optional element, rarity
-- [ ] Set a stat budget per rarity tier (edge values sum within a fixed range) so no tile strictly beats another
-- [ ] Generate the tile set with a script instead of by hand; the original game has 80, and your launch count is your call
+- [x] Define a `Tile` model: id, four edge values, optional element, rarity
+- [x] Set a stat budget per rarity tier (one fixed edge sum per tier) so no tile strictly beats another in its tier
+- [x] Generate the tile set with a script instead of by hand: 36 tiles at launch
 - [ ] Collection screen: grid view, filters by rarity and element, silhouettes for tiles not yet owned
 - [ ] Deck builder: pick a fixed number of tiles, save more than one deck
 - [ ] Give each opponent a deck drawn from the same tile pool
 - [ ] Turn order: coin flip by default instead of the opponent always going first
 
 Done when a player can build a deck, enter a match with it and see the opponent use tiles from the same pool.
+
+Decisions for this phase:
+
+- 36 tiles: 4 tiers (common, uncommon, rare, epic) x 9, each tier with 2 tiles per element and 1 plain tile. Each tile can be owned once; the collection is a set of tile ids, and rewards and the shop never offer an owned tile
+- Edges run 1 to 9. Elemental tiles have a fixed edge sum per tier (12, 16, 20, 24) and plain tiles get 1 more, because a plain tile breaks on every square. The tests use an element-aware dominance check
+- Decks are exactly 5 tiles, with no drawing from a larger deck, so hands stay visible and exact AI search stays possible
+- The old hand-written hands and `PlaceholderElements` go away when hands come from the tile set; turn order becomes a coin flip as the last PR of the phase
+- `scripts/generate_tiles.py` (fixed seed) writes `Models/TileSet.swift`; rerun it and the TileSetTests after any budget change
+
+Order of work: (1) Tile model and generated set, (2) hands from the pool, (3) collection and deck persistence, (4) collection screen, (5) deck builder, (6) coin flip. A short plan comes first for the two screens.
+
+Status: PR 1 (`Tile`, rarity budget, generated set) is open; the rest is not started.
 
 ## Phase 5: Campaign map, NPC progression, rewards and shop
 
