@@ -38,6 +38,10 @@ struct Tile: Identifiable, Equatable {
     /// Every edge value is a single digit so it fits on the stone.
     static let edgeRange = 1...9
 
+    /// The highest edge minus the lowest may not exceed this, so no tile is a spike
+    /// like 1/9/1/1. Keep it in step with MAX_SPREAD in scripts/generate_tiles.py.
+    static let maxEdgeSpread = 6
+
     /// A plain tile breaks on every elemental square, so at equal edges an elemental
     /// tile is strictly better. Plain tiles get this much extra edge sum to compensate.
     static let plainBonus = 1

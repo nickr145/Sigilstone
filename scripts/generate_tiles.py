@@ -5,7 +5,7 @@ Run from the repo root:  python3 scripts/generate_tiles.py
 
 The seed is fixed, so rerunning gives the same file. Change SEED to roll a new set,
 then check the result with the TileSetTests. The budget below must match Rarity.edgeSum,
-Tile.edgeRange and Tile.plainBonus in Sigilstone/Models/Tile.swift.
+Tile.edgeRange, Tile.maxEdgeSpread and Tile.plainBonus in Sigilstone/Models/Tile.swift.
 """
 import random
 from itertools import product
@@ -14,14 +14,15 @@ from pathlib import Path
 SEED = 20261103
 TIER_SUMS = {"common": 12, "uncommon": 16, "rare": 20, "epic": 24}
 EDGE_RANGE = range(1, 10)  # 1...9
+MAX_SPREAD = 6  # highest edge minus lowest edge
 PLAIN_BONUS = 1
 ELEMENTS = ["fire", "water", "earth", "air"]
 OUT = Path(__file__).resolve().parent.parent / "Sigilstone" / "Models" / "TileSet.swift"
 
 
 def compositions(total):
-    """Every ordered (top, right, bottom, left) with edges in range summing to total."""
-    return [t for t in product(EDGE_RANGE, repeat=4) if sum(t) == total]
+    """Every ordered (top, right, bottom, left) with edges in range summing to total and within the spread cap."""
+    return [t for t in product(EDGE_RANGE, repeat=4) if sum(t) == total and max(t) - min(t) <= MAX_SPREAD]
 
 
 def build_tier(rng, tier, base_sum):

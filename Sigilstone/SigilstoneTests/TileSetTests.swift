@@ -64,6 +64,13 @@ final class TileSetTests: XCTestCase {
         }
     }
 
+    func testTileSet_noTileIsTooLopsided() {
+        for tile in TileSet.all {
+            let spread = edges(tile).max()! - edges(tile).min()!
+            XCTAssertLessThanOrEqual(spread, Tile.maxEdgeSpread, "\(tile.id) spread")
+        }
+    }
+
     func testTileSet_noTileDominatesAnotherInItsTier() {
         for rarity in Rarity.allCases {
             let tier = TileSet.all.filter { $0.rarity == rarity }
