@@ -23,8 +23,8 @@ struct SeededGenerator: RandomNumberGenerator {
 
 final class GameRulesTests: XCTestCase {
 
-    private func stone(_ top: Int, _ right: Int, _ bottom: Int, _ left: Int, owner: Int) -> Stone {
-        Stone(top: top, right: right, bottom: bottom, left: left, owner: owner)
+    private func stone(_ top: Int, _ right: Int, _ bottom: Int, _ left: Int, owner: Int, element: Element? = nil) -> Stone {
+        Stone(top: top, right: right, bottom: bottom, left: left, owner: owner, element: element)
     }
 
     private func hand(owner: Int) -> [Stone] {
@@ -128,6 +128,131 @@ final class GameRulesTests: XCTestCase {
         XCTAssertEqual(next.currentPlayer, 2, "the turn does not advance after the final move")
         XCTAssertTrue(GameRules.legalMoves(in: next).isEmpty)
     }
+    
+    // MARK: - Elemental squares
+    
+    func testApply_matchingElement_staysOnTheBoardAndCaptures() {
+        var state = freshState()
+        state.cellElements[4] = .fire
+        state.board[1] = stone(1, 1, 1, 1, owner: 1)
+        let strongFire = stone(5, 5, 5, 5, owner: 2, element: .fire)
+        state.player2Hand[0] = strongFire
+
+        let next = GameRules.apply(Move(stone: strongFire, cell: 4), to: state)
+
+        XCTAssertEqual(next.board[4]?.id, strongFire.id)
+        XCTAssertEqual(next.board[1]?.owner, 2, "a matching stone acts normally")
+        XCTAssertTrue(next.blocks.isEmpty)
+    }
+
+    func testApply_wrongElement_breaksIntoABlock_andCapturesNothing() {
+        var state = freshState()
+        state.cellElements[4] = .fire
+        state.board[1] = stone(1, 1, 1, 1, owner: 1)
+        let strongWater = stone(5, 5, 5, 5, owner: 2, element: .water)
+        state.player2Hand[0] = strongWater
+
+        let next = GameRules.apply(Move(stone: strongWater, cell: 4), to: state)
+
+        XCTAssertNil(next.board[4], "the broken stone is not left on the board")
+        XCTAssertEqual(next.blocks, [4])
+        XCTAssertEqual(next.board[1]?.owner, 1, "a broken stone captures nothing")
+        XCTAssertEqual(next.player2Hand.count, 4, "the stone is used up")
+        XCTAssertEqual(next.currentPlayer, 1)
+        XCTAssertFalse(GameRules.isLegal(Move(stone: next.player1Hand[0], cell: 4), in: next), "nobody can play on a block")
+    }
+
+    func testApply_stoneWithNoElement_breaksOnAnElementalSquare() {
+        var state = freshState()
+        state.cellElements[4] = .fire
+        state.board[1] = stone(1, 1, 1, 1, owner: 1)
+        let strongNeutral = stone(5, 5, 5, 5, owner: 2)
+        state.player2Hand[0] = strongNeutral
+
+        let next = GameRules.apply(Move(stone: strongNeutral, cell: 4), to: state)
+
+        XCTAssertEqual(next.blocks, [4])
+        XCTAssertEqual(next.board[1]?.owner, 1)
+    }
+
+    func testApply_elementalStoneOnAPlainCell_staysOnTheBoard() {
+        var state = freshState()
+        let fire = stone(1, 1, 1, 1, owner: 2, element: .fire)
+        state.player2Hand[0] = fire
+
+        let next = GameRules.apply(Move(stone: fire, cell: 0), to: state)
+
+        XCTAssertEqual(next.board[0]?.id, fire.id)
+        XCTAssertTrue(next.blocks.isEmpty)
+    }
+
+    func testApply_aBreakOnTheLastCell_endsTheGameAsATie() {
+        var state = freshState()
+        for cell in 0..<8 {
+            state.board[cell] = stone(0, 0, 0, 0, owner: cell % 2 == 0 ? 1 : 2)
+        }
+        state.cellElements[8] = .earth
+        let last = state.player2Hand[0]
+
+        let next = GameRules.apply(Move(stone: last, cell: 8), to: state)
+
+        XCTAssertTrue(next.isOver)
+        XCTAssertNil(next.board[8])
+        XCTAssertEqual(next.blocks, [8])
+        XCTAssertEqual(next.currentPlayer, 2, "the turn does not advance after the final move")
+        XCTAssertEqual(next.score(for: 1), 4)
+        XCTAssertEqual(next.score(for: 2), 4)
+        XCTAssertNil(next.winner, "4-4 with a block is a tie")
+    }
+
+    func testRandomGames_withElementalSquares_keepTheBoardConsistent() {
+        var rng = SeededGenerator(seed: 99)
+        let elementChoices: [Element?] = [nil, .fire, .water, .earth, .air]
+
+        for game in 0..<100 {
+            var hand1: [Stone] = []
+            var hand2: [Stone] = []
+            for _ in 0..<5 {
+                var stone1 = TestPositions.randomStone(owner: 1, using: &rng)
+                stone1.element = elementChoices.randomElement(using: &rng)!
+                hand1.append(stone1)
+                var stone2 = TestPositions.randomStone(owner: 2, using: &rng)
+                stone2.element = elementChoices.randomElement(using: &rng)!
+                hand2.append(stone2)
+            }
+            var state = GameState(player1Hand: hand1, player2Hand: hand2, startingPlayer: 2)
+            for cell in (0..<9).shuffled(using: &rng).prefix(2) {
+                state.cellElements[cell] = Element.allCases.randomElement(using: &rng)
+            }
+
+            while !state.isOver {
+                guard let move = GameRules.legalMoves(in: state).randomElement(using: &rng) else {
+                    return XCTFail("game \(game): no legal move before the game ended")
+                }
+                state = GameRules.apply(move, to: state)
+
+                for cell in 0..<9 {
+                    guard let stone = state.board[cell] else { continue }
+                    XCTAssertFalse(state.blocks.contains(cell), "game \(game): stone on a block at \(cell)")
+                    if let required = state.cellElements[cell] {
+                        XCTAssertEqual(stone.element, required, "game \(game): mismatched stone survived at \(cell)")
+                    }
+                }
+            }
+
+            XCTAssertEqual(state.score(for: 1) + state.score(for: 2) + state.blocks.count, 9, "game \(game): every cell is a stone or a block")
+        }
+    }
+    
+    func testBreaks_isTrueOnlyForAMismatchOnAnElementalSquare() {
+        var state = freshState()
+        state.cellElements[4] = .fire
+        XCTAssertTrue(GameRules.breaks(Move(stone: stone(1, 1, 1, 1, owner: 2, element: .water), cell: 4), in: state))
+        XCTAssertTrue(GameRules.breaks(Move(stone: stone(1, 1, 1, 1, owner: 2), cell: 4), in: state), "no element breaks too")
+        XCTAssertFalse(GameRules.breaks(Move(stone: stone(1, 1, 1, 1, owner: 2, element: .fire), cell: 4), in: state))
+        XCTAssertFalse(GameRules.breaks(Move(stone: stone(1, 1, 1, 1, owner: 2, element: .water), cell: 0), in: state), "plain cell")
+        XCTAssertFalse(GameRules.breaks(Move(stone: stone(1, 1, 1, 1, owner: 2), cell: 9), in: state), "off the board")
+    }
 
     // MARK: - Engine vs the view model
 
@@ -186,3 +311,4 @@ final class GameRulesTests: XCTestCase {
         XCTAssertTrue(GameRules.legalMoves(in: state).isEmpty)
     }
 }
+
