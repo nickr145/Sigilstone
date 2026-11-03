@@ -35,18 +35,30 @@ enum GameRules {
         return moves
     }
     
+    /// Whether `move` would break the stone: it lands on an elemental square whose
+    /// element the stone doesn't have. A stone with no element breaks there too.
+    static func breaks(_ move: Move, in state: GameState) -> Bool {
+        guard state.cellElements.indices.contains(move.cell), let required = state.cellElements[move.cell] else { return false }
+        return move.stone.element != required
+    }
+    
     /// The state after `move` is played. The caller checks `isLegal` first; this
-    /// trusts it. The stone captures every neighbor it beats, leaves its owner's
-    /// hand, and the turn passes, except after the final move, when the turn stays
-    /// put because the game is over.
+    /// trusts it. A stone that breaks captures nothing and leaves a block on its
+    /// cell. Any other stone captures every neighbor it beats. Either way the stone
+    /// leaves its owner's hand and the turn passes, except after the final move,
+    /// when the turn stays put because the game is over.
     static func apply(_ move: Move, to state: GameState) -> GameState {
         var next = state
-        next.board[move.cell] = move.stone
-        
-        for neighbor in CaptureRules.capturedCells(by: move.stone, at: move.cell, on: next.board) {
-            next.board[neighbor]?.owner = move.stone.owner
+
+        if breaks(move, in: state) {
+            next.blocks.insert(move.cell)
+        } else {
+            next.board[move.cell] = move.stone
+            for neighbor in CaptureRules.capturedCells(by: move.stone, at: move.cell, on: next.board) {
+                next.board[neighbor]?.owner = move.stone.owner
+            }
         }
-        
+
         if move.stone.owner == 1 {
             if let index = next.player1Hand.firstIndex(of: move.stone) {
                 next.player1Hand.remove(at: index)
@@ -56,11 +68,10 @@ enum GameRules {
                 next.player2Hand.remove(at: index)
             }
         }
-        
+
         if !next.isOver {
             next.currentPlayer = state.currentPlayer == 1 ? 2 : 1
         }
-        
         return next
     }
 }
