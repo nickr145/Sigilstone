@@ -50,11 +50,14 @@ enum LevelSimulation {
 final class LevelStrengthTests: XCTestCase {
     /// The difficulty ladder. The reference player (look-ahead, player 1) holds the
     /// starter deck at EVERY level and plays 2-square boards with the computer moving
-    /// first; the opponent holds that level's deck. A level may be no easier than the
-    /// one before it, but levels may tie: with the starter deck, levels 5 and 6 can
-    /// both be near zero. The same seeded layouts are used at every level.
-    func testLadder_winRateNeverIncreasesAsTheLevelRises() {
+    /// first; the opponent holds that level's deck. The win rate should fall as the
+    /// level rises, but each rate comes from 300 games and carries about 2 points of
+    /// standard error, so a rate may rise by up to `tolerance` between adjacent levels
+    /// before the test fails. Levels may also tie: with the starter deck, levels 5 and 6
+    /// can both be near zero. The same seeded layouts are used at every level.
+    func testLadder_winRateDoesNotRiseAsTheLevelRisesBeyondTheTolerance() {
         let player = Deck.starter.stones(owner: 1)
+        let tolerance = 0.05
         var rates: [Double] = []
         for level in 1...6 {
             let opponent = OpponentDecks.deck(forLevel: level).stones(owner: 2)
@@ -66,7 +69,7 @@ final class LevelStrengthTests: XCTestCase {
             rates.append(record.winRate)
         }
         for level in 1..<6 {
-            XCTAssertLessThanOrEqual(rates[level], rates[level - 1], "level \(level + 1) is easier than level \(level)")
+            XCTAssertLessThanOrEqual(rates[level], rates[level - 1] + tolerance, "level \(level + 1) is easier than level \(level) by more than the tolerance")
         }
     }
 }
