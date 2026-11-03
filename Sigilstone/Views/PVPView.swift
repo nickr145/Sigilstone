@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PVPView: View {
     @StateObject var viewModel = GameViewModel()
+    @State private var hasStartedGame = false
     @EnvironmentObject var audioManager: AudioPlayerManager
     @Environment(\.dismiss) var dismiss  // For dismissing the view
     
@@ -67,6 +68,12 @@ struct PVPView: View {
             backButtonVstack
         }
         .onAppear {
+            // Turn squares on and deal the first layout once; a re-appearing screen must not reset a game in progress.
+            if !hasStartedGame {
+                hasStartedGame = true
+                viewModel.maxElementalSquares = 2
+                viewModel.resetGame()
+            }
             audioManager.playAudio(named: Constants.audioString)
         }
         .onDisappear {

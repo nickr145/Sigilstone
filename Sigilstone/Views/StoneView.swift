@@ -37,6 +37,14 @@ struct StoneView: View {
             .bold()
     }
     
+    private var accessibilityDescription: String {
+        var text = "Piece with top \(stone.top), right \(stone.right), bottom \(stone.bottom), left \(stone.left)"
+        if let element = stone.element {
+            text += ", \(element.displayName) element"
+        }
+        return text
+    }
+
     var body: some View {
         VStack {
             Text("\(stone.top)").font(.headline)
@@ -48,6 +56,14 @@ struct StoneView: View {
                 Text("\(stone.right)").font(.headline)
                     .bold()
             }
+            // An overlay, so the symbol sits between the side numbers without widening the stone.
+            .overlay {
+                if let element = stone.element {
+                    Image(systemName: element.symbolName)
+                        .font(.footnote)
+                        .foregroundColor(.white)
+                }
+            }
             Text("\(stone.bottom)").font(.headline)
                 .bold()
         }
@@ -58,7 +74,7 @@ struct StoneView: View {
                         Color.red.opacity(Constants.redOpacity))
         .cornerRadius(CGFloat(Constants.tileCornerRadius))
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Piece with top \(stone.top), right \(stone.right), bottom \(stone.bottom), left \(stone.left)")
+        .accessibilityLabel(accessibilityDescription)
 
     }
 }

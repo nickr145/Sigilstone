@@ -80,7 +80,7 @@ class GameViewModel: ObservableObject {
 
     init(persistence: PersistenceStore = UserDefaultsPersistenceStore(), analytics: AnalyticsService = ConsoleAnalyticsService()) {
         let piecesModel = PlayerPiecesModel()
-        self.gameState = Self.newGameState(player1Hand: piecesModel.player1Pieces, player2Hand: piecesModel.player2Pieces, startingPlayer: startingPlayer)
+        self.gameState = GameState(player1Hand: piecesModel.player1Pieces, player2Hand: piecesModel.player2Pieces, startingPlayer: startingPlayer)
         self.level1Pieces = piecesModel.level1Pieces
         self.level2Pieces = piecesModel.level2Pieces
         self.level3Pieces = piecesModel.level3Pieces
@@ -96,17 +96,21 @@ class GameViewModel: ObservableObject {
     
     var selectedDifficulty: Int = 1
     
-    private static let elementalSquareCount = 3
+    /// The most elemental squares a new game may get. 0 keeps boards plain, so unit
+    /// tests stay deterministic; the game screens set it to 2.
+    var maxElementalSquares = 0
     
-    /// A fresh game: placeholder elements on the hands and a new random scatter of
-    /// elemental squares. Static so init can call it before every property is set.
-    private static func newGameState(player1Hand: [Stone], player2Hand: [Stone], startingPlayer: Int) -> GameState {
-        var state = GameState(player1Hand: PlaceholderElements.assign(to: player1Hand),
-                              player2Hand: PlaceholderElements.assign(to: player2Hand),
-                              startingPlayer: startingPlayer)
+    /// A random layout of 1 to `maxElementalSquares` squares, or all plain when the max is 0.
+    private func newSquares() -> [Element?] {
+        guard maxElementalSquares > 0 else { return Array(repeating: nil, count: BoardGeometry.cellCount) }
         var generator = SystemRandomNumberGenerator()
-        state.cellElements = BoardGenerator.elementalSquares(count: elementalSquareCount, using: &generator)
-        return state
+        let count = Int.random(in: 1...maxElementalSquares, using: &generator)
+        return BoardGenerator.elementalSquares(count: count, using: &generator)
+    }
+    
+    /// Placeholder elements on a hand, only when squares are on.
+    private func withElements(_ hand: [Stone]) -> [Stone] {
+        maxElementalSquares > 0 ? PlaceholderElements.assign(to: hand) : hand
     }
     
     /// Difficulty is always 1-6 in practice (the picker that drives it only offers
@@ -128,8 +132,9 @@ class GameViewModel: ObservableObject {
         selectedDifficulty = level
         analytics.track(event: "game_started", properties: ["mode": "pvc", "difficulty": level])
         let hands = pieces(forDifficulty: level)
-        player2Pieces = PlaceholderElements.assign(to: hands.computer)
-        player1Pieces = PlaceholderElements.assign(to: hands.player1)
+        player2Pieces = withElements(hands.computer)
+        player1Pieces = withElements(hands.player1)
+        gameState.cellElements = newSquares()
         isPlayingComputer = true
         requestComputerMoveIfDue()
     }
@@ -201,7 +206,8 @@ class GameViewModel: ObservableObject {
             player1Hand = pvpPlayer1Hand
             player2Hand = pvpPlayer2Hand
         }
-        gameState = Self.newGameState(player1Hand: player1Hand, player2Hand: player2Hand, startingPlayer: startingPlayer)
+        gameState = GameState(player1Hand: withElements(player1Hand), player2Hand: withElements(player2Hand), startingPlayer: startingPlayer)
+        gameState.cellElements = newSquares()
         isGameOver = false
         winner = nil
         requestComputerMoveIfDue()
