@@ -26,20 +26,21 @@ struct Deck: Equatable {
 }
 
 /// The AI opponent's deck for each level, as explicit tile ids. Explicit, not "the
-/// first N of a tier", so regenerating the tile set cannot silently change a level.
-/// Edge totals follow from the fixed per-tier sums: 60, 60, 68, 76, 88, 104. Levels 1 and 2
-/// both hold five commons, so which five is the only lever between them: level 1 holds a
-/// weak-fitting five and level 2 a strong-fitting five (checked by the ladder test).
+/// first N of a tier", so regenerating the tile set cannot silently change a level (and
+/// the tile-set fingerprint test fails if it does). Edge totals follow from the fixed
+/// per-tier sums: 48, 59, 63, 75, 95, 107. Each deck holds at least 2 elemental tiles
+/// while every PvC board has elemental squares. These per-level lists are interim: the
+/// campaign PR replaces them with a reference to a representative node's deck.
 enum OpponentDecks {
     /// The deck for level 1 to 6. Anything else gets level 1's deck, like the strategies.
     static func deck(forLevel level: Int) -> Deck {
         switch level {
-        case 2: return Deck(tileIDs: ["common-fire-1", "common-fire-2", "common-water-2", "common-earth-2", "common-air-1"])
-        case 3: return Deck(tileIDs: ["common-fire-1", "common-water-1", "common-earth-2", "uncommon-air-1", "uncommon-fire-1"])
-        case 4: return Deck(tileIDs: ["common-air-2", "uncommon-fire-1", "uncommon-water-1", "uncommon-earth-1", "uncommon-air-2"])
-        case 5: return Deck(tileIDs: ["uncommon-fire-2", "uncommon-water-2", "uncommon-earth-2", "rare-air-1", "rare-fire-1"])
-        case 6: return Deck(tileIDs: ["rare-fire-2", "rare-water-1", "rare-earth-1", "rare-air-2", "epic-water-2"])
-        default: return Deck(tileIDs: ["common-fire-1", "common-fire-2", "common-water-1", "common-earth-1", "common-air-2"])
+        case 2: return Deck(tileIDs: ["common-water", "common-plain-3", "common-plain-1", "common-earth", "basic-fire"])
+        case 3: return Deck(tileIDs: ["common-plain-1", "common-fire", "common-plain-7", "common-plain-8", "common-water"])
+        case 4: return Deck(tileIDs: ["uncommon-air", "uncommon-plain-8", "common-water", "common-plain-8", "uncommon-plain-1"])
+        case 5: return Deck(tileIDs: ["rare-plain-1", "rare-plain-2", "rare-water", "uncommon-plain-3", "uncommon-fire"])
+        case 6: return Deck(tileIDs: ["rare-plain-6", "rare-plain-5", "rare-fire", "epic-earth", "rare-plain-3"])
+        default: return Deck(tileIDs: ["basic-plain-1", "basic-plain-3", "basic-fire", "basic-water", "basic-plain-2"])
         }
     }
 }
