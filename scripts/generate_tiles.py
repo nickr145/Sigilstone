@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Generates Sigilstone/Models/TileSet.swift: 4 tiers x (2 tiles per element + 1 plain).
+"""Generates Sigilstone/Models/TileSet.swift: 52 tiles in 5 tiers, mostly plain, with one
+elemental tile per element in every tier. Each tile has a source: starter, campaign or shop.
 
 Run from the repo root:  python3 scripts/generate_tiles.py
 
@@ -12,11 +13,29 @@ from itertools import product
 from pathlib import Path
 
 SEED = 20261103
-TIER_SUMS = {"common": 12, "uncommon": 16, "rare": 20, "epic": 24}
+# tier -> (elemental edge sum, plain tile count). Plain tiles get PLAIN_BONUS more.
+TIERS = {
+    "basic": (9, 6),
+    "common": (12, 8),
+    "uncommon": (16, 8),
+    "rare": (20, 6),
+    "epic": (24, 4),
+}
 EDGE_RANGE = range(1, 10)  # 1...9
 MAX_SPREAD = 6  # highest edge minus lowest edge
 PLAIN_BONUS = 1
 ELEMENTS = ["fire", "water", "earth", "air"]
+# Hand-specified plain basic tiles (top, right, bottom, left), each a different profile.
+# The first four are the starters; the fifth is the tutorial's reward.
+HAND = {
+    "basic-plain-1": (6, 2, 1, 1),  # vanguard: one strong edge
+    "basic-plain-2": (1, 4, 1, 4),  # flanker: strong left and right
+    "basic-plain-3": (3, 3, 2, 2),  # anchor: even, no weak side
+    "basic-plain-4": (3, 3, 3, 1),  # shield: solid, open on the left
+    "basic-plain-5": (2, 5, 2, 1),  # lancer: strong right (the tutorial's tile)
+}
+STARTERS = {"basic-plain-1", "basic-plain-2", "basic-plain-3", "basic-plain-4"}
+SHOP_TIERS = {"rare", "epic"}  # their elemental tiles are shop-exclusive
 OUT = Path(__file__).resolve().parent.parent / "Sigilstone" / "Models" / "TileSet.swift"
 
 
@@ -25,16 +44,30 @@ def compositions(total):
     return [t for t in product(EDGE_RANGE, repeat=4) if sum(t) == total and max(t) - min(t) <= MAX_SPREAD]
 
 
-def build_tier(rng, tier, base_sum):
-    used = set()  # sorted edge multisets, so no two tiles in a tier are rotations of each other
+def source_of(tier, tile_id, element):
+    if tile_id in STARTERS:
+        return "starter"
+    if tier in SHOP_TIERS and element:
+        return "shop"
+    return "campaign"
+
+
+def build_tier(rng, tier, base_sum, plain_count):
+    used = {tuple(sorted(e)) for k, e in HAND.items() if k.startswith(tier + "-")}  # sorted edge multisets, so no two tiles in a tier are rotations of each other
     tiles = []
-    slots = [(e, n) for e in ELEMENTS for n in (1, 2)] + [("plain", 1)]
+    slots = [(e, None) for e in ELEMENTS] + [("plain", n) for n in range(1, plain_count + 1)]
     for element, n in slots:
+        tile_id = f"{tier}-{element}" if n is None else f"{tier}-plain-{n}"
         total = base_sum + (PLAIN_BONUS if element == "plain" else 0)
-        options = [c for c in compositions(total) if tuple(sorted(c)) not in used]
-        edges = rng.choice(options)
-        used.add(tuple(sorted(edges)))
-        tiles.append((f"{tier}-{element}-{n}", edges, None if element == "plain" else element))
+        if tile_id in HAND:
+            edges = HAND[tile_id]
+            assert sum(edges) == total and max(edges) - min(edges) <= MAX_SPREAD, tile_id
+        else:
+            options = [c for c in compositions(total) if tuple(sorted(c)) not in used]
+            edges = rng.choice(options)
+            used.add(tuple(sorted(edges)))
+        el = None if element == "plain" else element
+        tiles.append((tile_id, edges, el, source_of(tier, tile_id, el)))
     return tiles
 
 
@@ -54,11 +87,11 @@ def main():
         "enum TileSet {",
         "    static let all: [Tile] = [",
     ]
-    for tier, base_sum in TIER_SUMS.items():
-        for tile_id, (t, r, b, l), element in build_tier(rng, tier, base_sum):
+    for tier, (base_sum, plain_count) in TIERS.items():
+        for tile_id, (t, r, b, l), element, source in build_tier(rng, tier, base_sum, plain_count):
             el = f".{element}" if element else "nil"
             lines.append(
-                f'        Tile(id: "{tile_id}", top: {t}, right: {r}, bottom: {b}, left: {l}, element: {el}, rarity: .{tier}),'
+                f'        Tile(id: "{tile_id}", top: {t}, right: {r}, bottom: {b}, left: {l}, element: {el}, rarity: .{tier}, source: .{source}),'
             )
     lines += ["    ]", "}", ""]
     OUT.write_text("\n".join(lines))

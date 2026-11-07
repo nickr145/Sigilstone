@@ -49,27 +49,40 @@ enum LevelSimulation {
 
 final class LevelStrengthTests: XCTestCase {
     /// The difficulty ladder. The reference player (look-ahead, player 1) holds the
-    /// starter deck at EVERY level and plays 2-square boards with the computer moving
-    /// first; the opponent holds that level's deck. The win rate should fall as the
-    /// level rises, but each rate comes from 300 games and carries about 2 points of
-    /// standard error, so a rate may rise by up to `tolerance` between adjacent levels
-    /// before the test fails. Levels may also tie: with the starter deck, levels 5 and 6
-    /// can both be near zero. The same seeded layouts are used at every level.
+    /// standard deck (five plain commons, the same deck PvP uses) at EVERY level and
+    /// plays 2-square boards with the computer moving first; the opponent holds that
+    /// level's deck. The win rate should fall as the level rises, but each rate comes
+    /// from 300 games and carries about 2 points of standard error, so a rate may rise
+    /// by up to `tolerance` between adjacent levels before the test fails. Levels may
+    /// also tie: the top levels can both be near zero. The same seeded layouts are used
+    /// at every level.
     func testLadder_winRateDoesNotRiseAsTheLevelRisesBeyondTheTolerance() {
-        let player = Deck.starter.stones(owner: 1)
         let tolerance = 0.05
+        let rates = ladder(player: Deck.standard, label: "standard deck")
+        for level in 1..<6 {
+            XCTAssertLessThanOrEqual(rates[level], rates[level - 1] + tolerance, "level \(level + 1) is easier than level \(level) by more than the tolerance")
+        }
+    }
+
+    /// For the record only: the same ladder for the deck a player holds after the
+    /// tutorial. It is not asserted; the five starter tiles are meant to be outclassed
+    /// from the middle levels on until the player collects more.
+    func testLadder_starterDeckRatesArePrinted() {
+        XCTAssertEqual(ladder(player: Deck.starter, label: "starter deck").count, 6)
+    }
+
+    private func ladder(player deck: Deck, label: String) -> [Double] {
+        let player = deck.stones(owner: 1)
         var rates: [Double] = []
         for level in 1...6 {
             let opponent = OpponentDecks.deck(forLevel: level).stones(owner: 2)
 
             let record = LevelSimulation.record(playerHand: player, opponentHand: opponent, level: level, squares: true, games: 300)
 
-            print("LEVELSTRENGTH new decks (starter deck vs level deck), 2 squares, level \(level): wins \(record.wins), ties \(record.ties), losses \(record.losses), win rate \(Int((record.winRate * 100).rounded()))%")
+            print("LEVELSTRENGTH v2 (\(label) vs level deck), 2 squares, level \(level): wins \(record.wins), ties \(record.ties), losses \(record.losses), win rate \(Int((record.winRate * 100).rounded()))%")
             XCTAssertEqual(record.games, 300)
             rates.append(record.winRate)
         }
-        for level in 1..<6 {
-            XCTAssertLessThanOrEqual(rates[level], rates[level - 1] + tolerance, "level \(level + 1) is easier than level \(level) by more than the tolerance")
-        }
+        return rates
     }
 }

@@ -5,22 +5,30 @@
 
 import Foundation
 
-/// How rare a tile is. Each tier has one fixed edge sum, so no tile can strictly beat
-/// another in its own tier by construction; a higher tier beating a lower one is the
-/// point of rarity. Keep these numbers in step with scripts/generate_tiles.py; the
-/// tests fail if the shipped set drifts from them.
+/// How rare a tile is, lowest tier first. Each tier has one fixed edge sum, so no tile
+/// can strictly beat another in its own tier by construction; a higher tier beating a
+/// lower one is the point of rarity. Keep these numbers in step with
+/// scripts/generate_tiles.py; the tests fail if the shipped set drifts from them.
 enum Rarity: String, CaseIterable {
-    case common, uncommon, rare, epic
+    case basic, common, uncommon, rare, epic
 
     /// What the four edges of an elemental tile in this tier add up to.
     var edgeSum: Int {
         switch self {
+        case .basic: return 9
         case .common: return 12
         case .uncommon: return 16
         case .rare: return 20
         case .epic: return 24
         }
     }
+}
+
+/// Where a tile comes from. Starter tiles are owned from the first launch, campaign
+/// tiles are dropped by NPC nodes, and shop tiles can only be bought with gold, never
+/// dropped.
+enum TileSource: String {
+    case starter, campaign, shop
 }
 
 /// A collectible tile: the fixed design a player owns and puts in a deck. In a match
@@ -34,6 +42,7 @@ struct Tile: Identifiable, Equatable {
     let left: Int
     let element: Element?
     let rarity: Rarity
+    let source: TileSource
 
     /// Every edge value is a single digit so it fits on the stone.
     static let edgeRange = 1...9

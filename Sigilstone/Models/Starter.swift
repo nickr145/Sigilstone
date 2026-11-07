@@ -5,21 +5,24 @@
 
 import Foundation
 
-/// What a new player owns: the 8 elemental commons, 2 per element. Held in code until
+/// What a new player owns: four plain basic tiles with four different profiles (a
+/// vanguard, a flanker, an anchor and a shield). The tutorial's reward is a fifth plain
+/// basic tile with another profile, which completes the starting deck. Held in code until
 /// the player profile exists; it becomes that profile's starting values.
 enum Starter {
-    static let collection: [String] = [
-        "common-fire-1", "common-fire-2",
-        "common-water-1", "common-water-2",
-        "common-earth-1", "common-earth-2",
-        "common-air-1", "common-air-2",
-    ]
+    static let collection: [String] = ["basic-plain-1", "basic-plain-2", "basic-plain-3", "basic-plain-4"]
+
+    /// The tile the tutorial node drops. Not owned at the start.
+    static let tutorialTileID = "basic-plain-5"
 }
 
 extension Deck {
-    /// The default deck: five owned commons that cover all four elements.
-    static let starter = Deck(tileIDs: ["common-fire-1", "common-water-1", "common-earth-1", "common-air-1", "common-fire-2"])
+    /// The deck a player has after the tutorial: the four starters plus the tutorial tile.
+    /// Until the deck builder exists this is the default PvC hand.
+    static let starter = Deck(tileIDs: Starter.collection + [Starter.tutorialTileID])
 
-    /// PvP is separate from progression: both players use the same standard deck.
-    static let standard = starter
+    /// PvP is separate from progression: both players use the same standard deck of five
+    /// plain commons. The board is plain in PvP, where an element does nothing, so the
+    /// deck has no elemental tile.
+    static let standard = Deck(tileIDs: ["common-plain-1", "common-plain-5", "common-plain-6", "common-plain-7", "common-plain-8"])
 }
