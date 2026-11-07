@@ -12,7 +12,12 @@ struct LevelRecord {
     var wins = 0
     var ties = 0
     var losses = 0
+    /// Stones flipped, and stones broken into blocks, summed over all games.
+    var captures = 0
+    var breaks = 0
     var games: Int { wins + ties + losses }
+    var capturesPerGame: Double { games == 0 ? 0 : Double(captures) / Double(games) }
+    var breaksPerGame: Double { games == 0 ? 0 : Double(breaks) / Double(games) }
     var winRate: Double { games == 0 ? 0 : Double(wins) / Double(games) }
 }
 
@@ -35,6 +40,8 @@ enum LevelSimulation {
             while !state.isOver {
                 let strategy: any AIStrategy = state.currentPlayer == 1 ? reference : opponent
                 guard let move = strategy.chooseMove(in: state, using: &rng) else { break }
+                record.captures += GameRules.capturedCells(by: move, in: state).count
+                if GameRules.breaks(move, in: state) { record.breaks += 1 }
                 state = GameRules.apply(move, to: state)
             }
             if let winner = state.winner {
@@ -58,9 +65,17 @@ final class LevelStrengthTests: XCTestCase {
     /// at every level.
     func testLadder_winRateDoesNotRiseAsTheLevelRisesBeyondTheTolerance() {
         let tolerance = 0.05
-        let rates = ladder(player: Deck.standard, label: "standard deck")
+        let records = ladder(player: Deck.standard, label: "standard deck")
+        let rates = records.map(\.winRate)
         for level in 1..<6 {
             XCTAssertLessThanOrEqual(rates[level], rates[level - 1] + tolerance, "level \(level + 1) is easier than level \(level) by more than the tolerance")
+        }
+        // With edges 0 to 4 many facing edges tie and nothing flips. The standard deck must
+        // still flip at least `floor` stones per game at every level, so games stay lively.
+        // Only the standard deck is asserted; the starter deck's numbers are printed.
+        let floor = 2.0
+        for (index, record) in records.enumerated() {
+            XCTAssertGreaterThanOrEqual(record.capturesPerGame, floor, "level \(index + 1) averages too few captures per game")
         }
     }
 
@@ -71,18 +86,18 @@ final class LevelStrengthTests: XCTestCase {
         XCTAssertEqual(ladder(player: Deck.starter, label: "starter deck").count, 6)
     }
 
-    private func ladder(player deck: Deck, label: String) -> [Double] {
+    private func ladder(player deck: Deck, label: String) -> [LevelRecord] {
         let player = deck.stones(owner: 1)
-        var rates: [Double] = []
+        var records: [LevelRecord] = []
         for level in 1...6 {
             let opponent = OpponentDecks.deck(forLevel: level).stones(owner: 2)
 
             let record = LevelSimulation.record(playerHand: player, opponentHand: opponent, level: level, squares: true, games: 300)
 
-            print("LEVELSTRENGTH v2 (\(label) vs level deck), 2 squares, level \(level): wins \(record.wins), ties \(record.ties), losses \(record.losses), win rate \(Int((record.winRate * 100).rounded()))%")
+            print("LEVELSTRENGTH v2 (\(label) vs level deck), 2 squares, level \(level): wins \(record.wins), ties \(record.ties), losses \(record.losses), win rate \(Int((record.winRate * 100).rounded()))%, captures per game \(String(format: "%.2f", record.capturesPerGame)), breaks per game \(String(format: "%.2f", record.breaksPerGame))")
             XCTAssertEqual(record.games, 300)
-            rates.append(record.winRate)
+            records.append(record)
         }
-        return rates
+        return records
     }
 }
