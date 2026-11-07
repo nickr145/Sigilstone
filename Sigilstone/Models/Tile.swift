@@ -15,11 +15,11 @@ enum Rarity: String, CaseIterable {
     /// What the four edges of an elemental tile in this tier add up to.
     var edgeSum: Int {
         switch self {
-        case .basic: return 9
-        case .common: return 12
-        case .uncommon: return 16
-        case .rare: return 20
-        case .epic: return 24
+        case .basic: return 3
+        case .common: return 5
+        case .uncommon: return 7
+        case .rare: return 9
+        case .epic: return 11
         }
     }
 }
@@ -44,12 +44,10 @@ struct Tile: Identifiable, Equatable {
     let rarity: Rarity
     let source: TileSource
 
-    /// Every edge value is a single digit so it fits on the stone.
-    static let edgeRange = 1...9
-
-    /// The highest edge minus the lowest may not exceed this, so no tile is a spike
-    /// like 1/9/1/1. Keep it in step with MAX_SPREAD in scripts/generate_tiles.py.
-    static let maxEdgeSpread = 6
+    /// Every edge is 0 to 4. A tile has at least one nonzero edge, never four equal edges,
+    /// and a 4 only in rare and epic tiles, at most one per tile (TileSetTests checks all
+    /// of this). Keep it in step with scripts/generate_tiles.py.
+    static let edgeRange = 0...4
 
     /// A plain tile breaks on every elemental square, so at equal edges an elemental
     /// tile is strictly better. Plain tiles get this much extra edge sum to compensate.

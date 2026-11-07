@@ -24,5 +24,5 @@ extension Deck {
     /// PvP is separate from progression: both players use the same standard deck of five
     /// plain commons. The board is plain in PvP, where an element does nothing, so the
     /// deck has no elemental tile.
-    static let standard = Deck(tileIDs: ["common-plain-1", "common-plain-5", "common-plain-6", "common-plain-7", "common-plain-8"])
+    static let standard = Deck(tileIDs: ["common-plain-1", "common-plain-2", "common-plain-3", "common-plain-4", "common-plain-5"])
 }

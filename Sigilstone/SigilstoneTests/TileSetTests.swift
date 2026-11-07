@@ -6,6 +6,14 @@
 import XCTest
 @testable import Sigilstone
 
+/// A tile's edges as the smallest of their four rotations. Two tiles are the same design
+/// exactly when their keys are equal: turning a tile a quarter turn does not make a new one,
+/// but putting the same edges on different sides (adjacent against opposite) does.
+func rotationKey(_ tile: Tile) -> [Int] {
+    let e = [tile.top, tile.right, tile.bottom, tile.left]
+    return (0..<4).map { shift in Array(e[shift...] + e[..<shift]) }.min { $0.lexicographicallyPrecedes($1) }!
+}
+
 final class TileSetTests: XCTestCase {
 
     private func edges(_ tile: Tile) -> [Int] { [tile.top, tile.right, tile.bottom, tile.left] }
@@ -47,18 +55,18 @@ final class TileSetTests: XCTestCase {
 
     /// Plain and elemental tiles per tier: mostly elementless, one tile per element.
     private let shape: [Rarity: (plain: Int, elemental: Int)] = [
-        .basic: (6, 4), .common: (8, 4), .uncommon: (8, 4), .rare: (6, 4), .epic: (4, 4),
+        .basic: (5, 4), .common: (6, 4), .uncommon: (6, 4), .rare: (4, 4), .epic: (3, 4),
     ]
 
     func testRarity_runsFromBasicUpAndEachTierHasOneEdgeSum() {
         XCTAssertEqual(Rarity.allCases, [.basic, .common, .uncommon, .rare, .epic])
-        XCTAssertEqual(Rarity.allCases.map(\.edgeSum), [9, 12, 16, 20, 24])
+        XCTAssertEqual(Rarity.allCases.map(\.edgeSum), [3, 5, 7, 9, 11])
     }
 
-    func testTileSet_hasFiftyTwoTilesInFiveTiers() {
-        XCTAssertEqual(TileSet.all.count, 52)
-        XCTAssertEqual(Set(TileSet.all.map(\.id)).count, 52, "ids are unique")
-        XCTAssertEqual(TileSet.all.filter { $0.element == nil }.count, 32, "plain")
+    func testTileSet_hasFortyFourTilesInFiveTiers() {
+        XCTAssertEqual(TileSet.all.count, 44)
+        XCTAssertEqual(Set(TileSet.all.map(\.id)).count, 44, "ids are unique")
+        XCTAssertEqual(TileSet.all.filter { $0.element == nil }.count, 24, "plain")
         XCTAssertEqual(TileSet.all.filter { $0.element != nil }.count, 20, "elemental")
         for rarity in Rarity.allCases {
             let expected = shape[rarity]!
@@ -78,10 +86,20 @@ final class TileSetTests: XCTestCase {
         }
     }
 
-    func testTileSet_noTileIsTooLopsided() {
+    /// The owner's rule: every edge is 0 to 4, at least one is above 0, no tile has four
+    /// equal edges, and a 4 appears only in rare and epic tiles, at most once per tile.
+    func testTileSet_followsTheEdgeRules() {
+        XCTAssertEqual(Tile.edgeRange, 0...4)
         for tile in TileSet.all {
-            let spread = edges(tile).max()! - edges(tile).min()!
-            XCTAssertLessThanOrEqual(spread, Tile.maxEdgeSpread, "\(tile.id) spread")
+            let e = edges(tile)
+            XCTAssertTrue(e.allSatisfy { Tile.edgeRange.contains($0) }, "\(tile.id) edge outside 0 to 4")
+            XCTAssertGreaterThan(e.max()!, 0, "\(tile.id) has no nonzero edge")
+            XCTAssertGreaterThan(Set(e).count, 1, "\(tile.id) has four equal edges")
+            let fours = e.filter { $0 == 4 }.count
+            XCTAssertLessThanOrEqual(fours, 1, "\(tile.id) has more than one 4")
+            if tile.rarity != .rare && tile.rarity != .epic {
+                XCTAssertEqual(fours, 0, "\(tile.id) has a 4 below rare")
+            }
         }
     }
 
@@ -95,14 +113,19 @@ final class TileSetTests: XCTestCase {
                 }
             }
         }
-        XCTAssertEqual(pairsChecked, 10 * 9 + 12 * 11 + 12 * 11 + 10 * 9 + 8 * 7, "every ordered pair in every tier")
+        XCTAssertEqual(pairsChecked, 9 * 8 + 10 * 9 + 10 * 9 + 8 * 7 + 7 * 6, "every ordered pair in every tier")
     }
 
     func testTileSet_tilesInATierAreVaried() {
         for rarity in Rarity.allCases {
-            let shapes = Set(tier(rarity).map { edges($0).sorted() })
-            XCTAssertEqual(shapes.count, tier(rarity).count, "\(rarity): two tiles are rotations of each other")
+            let designs = Set(tier(rarity).map(rotationKey))
+            XCTAssertEqual(designs.count, tier(rarity).count, "\(rarity): two tiles are rotations of each other")
         }
+    }
+
+    func testRotationKey_ignoresTurnsButNotArrangement() {
+        XCTAssertEqual(rotationKey(tile([2, 0, 0, 2], nil)), rotationKey(tile([2, 2, 0, 0], nil)), "adjacent pairs are rotations of each other")
+        XCTAssertNotEqual(rotationKey(tile([2, 0, 2, 0], nil)), rotationKey(tile([2, 2, 0, 0], nil)), "opposite against adjacent differ")
     }
 
     // MARK: - Sources
@@ -116,10 +139,10 @@ final class TileSetTests: XCTestCase {
         }
     }
 
-    func testSources_countsAre4Starter8Shop40Campaign() {
+    func testSources_countsAre4Starter8Shop32Campaign() {
         XCTAssertEqual(TileSet.all.filter { $0.source == .starter }.count, 4)
         XCTAssertEqual(TileSet.all.filter { $0.source == .shop }.count, 8)
-        XCTAssertEqual(TileSet.all.filter { $0.source == .campaign }.count, 40)
+        XCTAssertEqual(TileSet.all.filter { $0.source == .campaign }.count, 32)
         XCTAssertTrue(TileSet.all.filter { $0.source == .shop }.allSatisfy { $0.element != nil }, "the shop sells elemental tiles")
     }
 
@@ -135,58 +158,50 @@ final class TileSetTests: XCTestCase {
     }
 
     static let expectedFingerprint: [String] = [
-        "basic-fire 1/1/6/1 fire basic campaign",
-        "basic-water 1/3/1/4 water basic campaign",
-        "basic-earth 1/5/1/2 earth basic campaign",
-        "basic-air 1/4/2/2 air basic campaign",
-        "basic-plain-1 6/2/1/1 plain basic starter",
-        "basic-plain-2 1/4/1/4 plain basic starter",
-        "basic-plain-3 3/3/2/2 plain basic starter",
-        "basic-plain-4 3/3/3/1 plain basic starter",
-        "basic-plain-5 2/5/2/1 plain basic campaign",
-        "basic-plain-6 1/5/1/3 plain basic campaign",
-        "common-fire 1/7/2/2 fire common campaign",
-        "common-water 1/3/5/3 water common campaign",
-        "common-earth 3/2/6/1 earth common campaign",
-        "common-air 2/3/3/4 air common campaign",
-        "common-plain-1 5/1/2/5 plain common campaign",
-        "common-plain-2 5/1/4/3 plain common campaign",
-        "common-plain-3 2/1/4/6 plain common campaign",
-        "common-plain-4 2/1/3/7 plain common campaign",
-        "common-plain-5 3/6/3/1 plain common campaign",
-        "common-plain-6 2/4/2/5 plain common campaign",
-        "common-plain-7 3/5/3/2 plain common campaign",
-        "common-plain-8 4/3/4/2 plain common campaign",
-        "uncommon-fire 4/3/7/2 fire uncommon campaign",
-        "uncommon-water 2/5/3/6 water uncommon campaign",
-        "uncommon-earth 3/6/3/4 earth uncommon campaign",
-        "uncommon-air 4/1/4/7 air uncommon campaign",
-        "uncommon-plain-1 7/2/6/2 plain uncommon campaign",
-        "uncommon-plain-2 6/3/2/6 plain uncommon campaign",
-        "uncommon-plain-3 7/3/4/3 plain uncommon campaign",
-        "uncommon-plain-4 4/1/6/6 plain uncommon campaign",
-        "uncommon-plain-5 4/8/2/3 plain uncommon campaign",
-        "uncommon-plain-6 3/4/5/5 plain uncommon campaign",
-        "uncommon-plain-7 3/7/1/6 plain uncommon campaign",
-        "uncommon-plain-8 7/2/1/7 plain uncommon campaign",
-        "rare-fire 3/7/2/8 fire rare shop",
-        "rare-water 2/4/6/8 water rare shop",
-        "rare-earth 2/7/7/4 earth rare shop",
-        "rare-air 4/7/3/6 air rare shop",
-        "rare-plain-1 5/3/6/7 plain rare campaign",
-        "rare-plain-2 5/8/6/2 plain rare campaign",
-        "rare-plain-3 5/9/4/3 plain rare campaign",
-        "rare-plain-4 4/5/5/7 plain rare campaign",
-        "rare-plain-5 3/6/4/8 plain rare campaign",
-        "rare-plain-6 6/6/5/4 plain rare campaign",
-        "epic-fire 5/8/4/7 fire epic shop",
-        "epic-water 3/5/8/8 water epic shop",
-        "epic-earth 3/8/6/7 earth epic shop",
-        "epic-air 7/5/6/6 air epic shop",
-        "epic-plain-1 4/6/9/6 plain epic campaign",
-        "epic-plain-2 9/6/5/5 plain epic campaign",
-        "epic-plain-3 9/5/8/3 plain epic campaign",
-        "epic-plain-4 5/6/8/6 plain epic campaign",
+        "basic-fire 0/0/2/1 fire basic campaign",
+        "basic-water 0/1/1/1 water basic campaign",
+        "basic-earth 0/0/3/0 earth basic campaign",
+        "basic-air 0/1/2/0 air basic campaign",
+        "basic-plain-1 2/0/0/2 plain basic starter",
+        "basic-plain-2 0/2/0/2 plain basic starter",
+        "basic-plain-3 0/1/2/1 plain basic starter",
+        "basic-plain-4 3/1/0/0 plain basic starter",
+        "basic-plain-5 0/3/0/1 plain basic campaign",
+        "common-fire 1/0/1/3 fire common campaign",
+        "common-water 0/3/0/2 water common campaign",
+        "common-earth 0/1/2/2 earth common campaign",
+        "common-air 1/3/0/1 air common campaign",
+        "common-plain-1 1/2/1/2 plain common campaign",
+        "common-plain-2 3/0/1/2 plain common campaign",
+        "common-plain-3 3/1/0/2 plain common campaign",
+        "common-plain-4 0/3/3/0 plain common campaign",
+        "common-plain-5 0/3/2/1 plain common campaign",
+        "common-plain-6 2/0/2/2 plain common campaign",
+        "uncommon-fire 1/3/0/3 fire uncommon campaign",
+        "uncommon-water 2/2/1/2 water uncommon campaign",
+        "uncommon-earth 1/3/2/1 earth uncommon campaign",
+        "uncommon-air 1/3/3/0 air uncommon campaign",
+        "uncommon-plain-1 2/1/2/3 plain uncommon campaign",
+        "uncommon-plain-2 2/3/3/0 plain uncommon campaign",
+        "uncommon-plain-3 2/2/3/1 plain uncommon campaign",
+        "uncommon-plain-4 3/2/2/1 plain uncommon campaign",
+        "uncommon-plain-5 1/3/1/3 plain uncommon campaign",
+        "uncommon-plain-6 1/3/3/1 plain uncommon campaign",
+        "rare-fire 4/3/2/0 fire rare shop",
+        "rare-water 1/4/1/3 water rare shop",
+        "rare-earth 0/2/4/3 earth rare shop",
+        "rare-air 0/4/2/3 air rare shop",
+        "rare-plain-1 2/4/1/3 plain rare campaign",
+        "rare-plain-2 2/2/4/2 plain rare campaign",
+        "rare-plain-3 3/4/3/0 plain rare campaign",
+        "rare-plain-4 3/4/2/1 plain rare campaign",
+        "epic-fire 2/3/4/2 fire epic shop",
+        "epic-water 2/2/4/3 water epic shop",
+        "epic-earth 3/3/3/2 earth epic shop",
+        "epic-air 3/4/3/1 air epic shop",
+        "epic-plain-1 2/3/3/4 plain epic campaign",
+        "epic-plain-2 2/4/3/3 plain epic campaign",
+        "epic-plain-3 4/3/2/3 plain epic campaign",
     ]
 
     // MARK: - Tile to Stone

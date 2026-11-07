@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Generates Sigilstone/Models/TileSet.swift: 52 tiles in 5 tiers, mostly plain, with one
+"""Generates Sigilstone/Models/TileSet.swift: 44 tiles in 5 tiers, mostly plain, with one
 elemental tile per element in every tier. Each tile has a source: starter, campaign or shop.
 
 Run from the repo root:  python3 scripts/generate_tiles.py
 
 The seed is fixed, so rerunning gives the same file. Change SEED to roll a new set,
 then check the result with the TileSetTests. The budget below must match Rarity.edgeSum,
-Tile.edgeRange, Tile.maxEdgeSpread and Tile.plainBonus in Sigilstone/Models/Tile.swift.
+Tile.edgeRange and Tile.plainBonus in Sigilstone/Models/Tile.swift.
 """
 import random
 from itertools import product
@@ -15,33 +15,44 @@ from pathlib import Path
 SEED = 20261103
 # tier -> (elemental edge sum, plain tile count). Plain tiles get PLAIN_BONUS more.
 TIERS = {
-    "basic": (9, 6),
-    "common": (12, 8),
-    "uncommon": (16, 8),
-    "rare": (20, 6),
-    "epic": (24, 4),
+    "basic": (3, 5),
+    "common": (5, 6),
+    "uncommon": (7, 6),
+    "rare": (9, 4),
+    "epic": (11, 3),
 }
-EDGE_RANGE = range(1, 10)  # 1...9
-MAX_SPREAD = 6  # highest edge minus lowest edge
+EDGE_RANGE = range(0, 5)  # 0...4
+FOUR_TIERS = {"rare", "epic"}  # a 4 appears only here, at most one per tile
 PLAIN_BONUS = 1
 ELEMENTS = ["fire", "water", "earth", "air"]
 # Hand-specified plain basic tiles (top, right, bottom, left), each a different profile.
 # The first four are the starters; the fifth is the tutorial's reward.
 HAND = {
-    "basic-plain-1": (6, 2, 1, 1),  # vanguard: one strong edge
-    "basic-plain-2": (1, 4, 1, 4),  # flanker: strong left and right
-    "basic-plain-3": (3, 3, 2, 2),  # anchor: even, no weak side
-    "basic-plain-4": (3, 3, 3, 1),  # shield: solid, open on the left
-    "basic-plain-5": (2, 5, 2, 1),  # lancer: strong right (the tutorial's tile)
+    "basic-plain-1": (2, 0, 0, 2),  # vanguard: strong north and west
+    "basic-plain-2": (0, 2, 0, 2),  # flanker: strong east and west
+    "basic-plain-3": (0, 1, 2, 1),  # anchor: moderate south, low east and west
+    "basic-plain-4": (3, 1, 0, 0),  # ranged: strong north, a little east
+    "basic-plain-5": (0, 3, 0, 1),  # lancer: strong east (the tutorial's tile)
 }
 STARTERS = {"basic-plain-1", "basic-plain-2", "basic-plain-3", "basic-plain-4"}
 SHOP_TIERS = {"rare", "epic"}  # their elemental tiles are shop-exclusive
 OUT = Path(__file__).resolve().parent.parent / "Sigilstone" / "Models" / "TileSet.swift"
 
 
-def compositions(total):
-    """Every ordered (top, right, bottom, left) with edges in range summing to total and within the spread cap."""
-    return [t for t in product(EDGE_RANGE, repeat=4) if sum(t) == total and max(t) - min(t) <= MAX_SPREAD]
+def rotation_key(edges):
+    """The smallest rotation of the edges: two tiles are the same design when their keys are equal."""
+    return min(tuple(edges[i:]) + tuple(edges[:i]) for i in range(4))
+
+
+def valid(edges, tier):
+    """The edge rules: not four equal edges; a 4 only in rare and epic, at most one."""
+    fours = edges.count(4)
+    return len(set(edges)) > 1 and (fours == 0 or (tier in FOUR_TIERS and fours == 1))
+
+
+def compositions(total, tier):
+    """Every ordered (top, right, bottom, left) with edges in range summing to total and obeying the edge rules."""
+    return [t for t in product(EDGE_RANGE, repeat=4) if sum(t) == total and valid(t, tier)]
 
 
 def source_of(tier, tile_id, element):
@@ -53,7 +64,7 @@ def source_of(tier, tile_id, element):
 
 
 def build_tier(rng, tier, base_sum, plain_count):
-    used = {tuple(sorted(e)) for k, e in HAND.items() if k.startswith(tier + "-")}  # sorted edge multisets, so no two tiles in a tier are rotations of each other
+    used = {rotation_key(e) for k, e in HAND.items() if k.startswith(tier + "-")}  # so no two tiles in a tier are rotations of each other
     tiles = []
     slots = [(e, None) for e in ELEMENTS] + [("plain", n) for n in range(1, plain_count + 1)]
     for element, n in slots:
@@ -61,11 +72,11 @@ def build_tier(rng, tier, base_sum, plain_count):
         total = base_sum + (PLAIN_BONUS if element == "plain" else 0)
         if tile_id in HAND:
             edges = HAND[tile_id]
-            assert sum(edges) == total and max(edges) - min(edges) <= MAX_SPREAD, tile_id
+            assert sum(edges) == total and valid(edges, tier), tile_id
         else:
-            options = [c for c in compositions(total) if tuple(sorted(c)) not in used]
+            options = [c for c in compositions(total, tier) if rotation_key(c) not in used]
             edges = rng.choice(options)
-            used.add(tuple(sorted(edges)))
+            used.add(rotation_key(edges))
         el = None if element == "plain" else element
         tiles.append((tile_id, edges, el, source_of(tier, tile_id, el)))
     return tiles
