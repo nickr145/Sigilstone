@@ -233,12 +233,13 @@ final class GameViewModelTests: XCTestCase {
     }
 
     func testPvcHands_comeFromTheInjectedPlayerDeckAndTheLevelsOpponentDeck() {
-        let custom = Deck(tileIDs: ["common-fire-2", "common-water-2", "common-earth-2", "common-air-2", "common-air-1"])
+        let custom = Deck(tileIDs: ["common-fire", "common-water", "common-earth", "common-air", "common-plain-2"])
         let viewModel = GameViewModel(persistence: InMemoryPersistenceStore(), analytics: SpyAnalyticsService(), playerDeck: custom)
 
         viewModel.setupComputerDifficulty(5)
 
         XCTAssertEqual(viewModel.player1Pieces.map(\.tileID), custom.tileIDs)
+        XCTAssertEqual(viewModel.player1Pieces.map(\.element), [.fire, .water, .earth, .air, nil], "stones carry their tile's element")
         XCTAssertTrue(viewModel.player1Pieces.allSatisfy { $0.owner == 1 })
         XCTAssertEqual(viewModel.player2Pieces.map(\.tileID), OpponentDecks.deck(forLevel: 5).tileIDs)
         XCTAssertTrue(viewModel.player2Pieces.allSatisfy { $0.owner == 2 })

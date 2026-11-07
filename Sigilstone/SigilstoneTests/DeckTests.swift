@@ -8,35 +8,52 @@ import XCTest
 
 final class DeckTests: XCTestCase {
 
-    private func elements(_ tiles: [Tile]) -> Set<Element> { Set(tiles.compactMap(\.element)) }
-
     // MARK: - Starter collection and deck
 
-    func testStarterCollection_isTheEightElementalCommons() {
+    private func sortedEdges(_ tile: Tile) -> [Int] { [tile.top, tile.right, tile.bottom, tile.left].sorted() }
+
+    func testStarterCollection_isFourPlainBasicTilesWithTheStarterSource() {
         let tiles = Starter.collection.compactMap { TileSet.byID[$0] }
 
-        XCTAssertEqual(Starter.collection.count, 8)
-        XCTAssertEqual(Set(Starter.collection).count, 8, "no duplicates")
-        XCTAssertEqual(tiles.count, 8, "every id resolves")
-        XCTAssertTrue(tiles.allSatisfy { $0.rarity == .common && $0.element != nil })
-        for element in Element.allCases {
-            XCTAssertEqual(tiles.filter { $0.element == element }.count, 2, "\(element)")
-        }
+        XCTAssertEqual(Starter.collection.count, 4)
+        XCTAssertEqual(Set(Starter.collection).count, 4, "no duplicates")
+        XCTAssertEqual(tiles.count, 4, "every id resolves")
+        XCTAssertTrue(tiles.allSatisfy { $0.rarity == .basic && $0.element == nil && $0.source == .starter })
     }
 
-    func testStarterDeck_isFiveOwnedCommonsCoveringAllFourElements() {
-        let tiles = Deck.starter.tiles
+    func testTutorialTile_isAFifthPlainBasicTileThatTheTutorialDrops() throws {
+        let tile = try XCTUnwrap(TileSet.byID[Starter.tutorialTileID])
 
-        XCTAssertEqual(Deck.starter.tileIDs.count, Deck.size)
-        XCTAssertEqual(Set(Deck.starter.tileIDs).count, Deck.size)
+        XCTAssertFalse(Starter.collection.contains(tile.id))
+        XCTAssertTrue(tile.rarity == .basic && tile.element == nil)
+        XCTAssertEqual(tile.source, .campaign, "dropped by the tutorial node's reward order, not owned at the start")
+    }
+
+    /// The five starting profiles must feel different: no two share a sorted edge set (a
+    /// rotation of a tile is the same profile), and they come in at least three shapes,
+    /// counted as how many edges are 4 or more (0 is an even anchor, 1 a vanguard, 2 a flanker).
+    func testStarterProfiles_allFiveDiffer() {
+        let tiles = (Starter.collection + [Starter.tutorialTileID]).compactMap { TileSet.byID[$0] }
+
+        XCTAssertEqual(tiles.count, 5)
+        XCTAssertEqual(Set(tiles.map(sortedEdges)).count, 5, "two starter profiles are rotations of each other")
+        XCTAssertGreaterThanOrEqual(Set(tiles.map { sortedEdges($0).filter { $0 >= 4 }.count }).count, 3, "at least three shapes")
+    }
+
+    /// Until the deck builder exists, the PvC hand is the deck a player has after the tutorial.
+    func testStarterDeck_isTheFourStartersPlusTheTutorialTile() {
+        XCTAssertEqual(Deck.starter.tileIDs, Starter.collection + [Starter.tutorialTileID])
+        XCTAssertEqual(Deck.starter.tiles.count, Deck.size, "every id resolves")
+    }
+
+    func testStandardDeck_isFiveDistinctPlainCommons() {
+        let tiles = Deck.standard.tiles
+
+        XCTAssertEqual(Deck.standard.tileIDs.count, Deck.size)
+        XCTAssertEqual(Set(Deck.standard.tileIDs).count, Deck.size)
         XCTAssertEqual(tiles.count, Deck.size, "every id resolves")
-        XCTAssertTrue(Deck.starter.tileIDs.allSatisfy(Starter.collection.contains), "the deck is made of owned tiles")
-        XCTAssertTrue(tiles.allSatisfy { $0.rarity == .common && $0.element != nil }, "commons only, no plain tile")
-        XCTAssertEqual(elements(tiles), Set(Element.allCases))
-    }
-
-    func testStandardDeck_isTheStarterDeck() {
-        XCTAssertEqual(Deck.standard, Deck.starter)
+        XCTAssertTrue(tiles.allSatisfy { $0.rarity == .common && $0.element == nil }, "no elemental tile: the element does nothing on a clean board")
+        XCTAssertEqual(Set(tiles.map(sortedEdges)).count, Deck.size, "five different profiles")
     }
 
     // MARK: - Opponent decks
@@ -44,12 +61,12 @@ final class DeckTests: XCTestCase {
     /// The design table: rarity mix and total edge sum per level. The sums come from
     /// the fixed per-tier sums, so they stay put if the tile set is regenerated.
     private let design: [Int: (mix: [Rarity: Int], total: Int)] = [
-        1: ([.common: 5], 60),
-        2: ([.common: 5], 60),
-        3: ([.common: 3, .uncommon: 2], 68),
-        4: ([.common: 1, .uncommon: 4], 76),
-        5: ([.uncommon: 3, .rare: 2], 88),
-        6: ([.rare: 4, .epic: 1], 104),
+        1: ([.basic: 5], 48),
+        2: ([.common: 4, .basic: 1], 59),
+        3: ([.common: 5], 63),
+        4: ([.uncommon: 3, .common: 2], 75),
+        5: ([.rare: 3, .uncommon: 2], 95),
+        6: ([.rare: 4, .epic: 1], 107),
     ]
 
     func testOpponentDecks_followTheDesignTable() {
@@ -66,9 +83,11 @@ final class DeckTests: XCTestCase {
         }
     }
 
-    func testOpponentDecks_coverAtLeastThreeElements() {
+    /// While every PvC board has elemental squares, an opponent deck needs elemental tiles
+    /// of its own. The stage PR relaxes this for levels on clean and block-only boards.
+    func testOpponentDecks_holdAtLeastTwoElementalTiles() {
         for level in 1...6 {
-            XCTAssertGreaterThanOrEqual(elements(OpponentDecks.deck(forLevel: level).tiles).count, 3, "level \(level)")
+            XCTAssertGreaterThanOrEqual(OpponentDecks.deck(forLevel: level).tiles.filter { $0.element != nil }.count, 2, "level \(level)")
         }
     }
 
