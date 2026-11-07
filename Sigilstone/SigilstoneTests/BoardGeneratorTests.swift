@@ -31,15 +31,4 @@ final class BoardGeneratorTests: XCTestCase {
 
         XCTAssertEqual(BoardGenerator.elementalSquares(count: 2, using: &first), BoardGenerator.elementalSquares(count: 2, using: &second))
     }
-
-    func testPlaceholderElements_giveTheFirstFourStonesAnElementEach() {
-        let hand = (0..<5).map { Stone(top: $0, right: 1, bottom: 2, left: 3, owner: 1) }
-
-        let assigned = PlaceholderElements.assign(to: hand)
-
-        XCTAssertEqual(assigned.map(\.element), [.fire, .water, .earth, .air, nil])
-        XCTAssertEqual(assigned.map(\.id), hand.map(\.id), "same stones, same ids")
-        XCTAssertEqual(assigned.map(\.top), hand.map(\.top), "edges are untouched")
-    }
 }
-

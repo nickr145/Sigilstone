@@ -12,7 +12,6 @@ class GameViewModel: ObservableObject {
     @Published var difficultyImageStrings = GameStringConstants.difficultyImageStrings
     @Published var difficultyLevelNameStrings = GameStringConstants.difficultyLevelNameStrings
     @Published var musicDifficultyStrings = GameStringConstants.musicDifficultyStrings
-    @Published var piecesModel = PlayerPiecesModel()
     
 //    @Published var board: [Stone?] = Array(repeating: nil, count: 9)
 //    @Published var player1Pieces: [Stone]
@@ -63,14 +62,13 @@ class GameViewModel: ObservableObject {
     private let computerPlayer = 2
     private var isPlayingComputer = false
 
-    private var level1Pieces: [Stone]
-    private var level2Pieces: [Stone]
-    private var level3Pieces: [Stone]
-    private var level4Pieces: [Stone]
-    private var level5Pieces: [Stone]
-    private var level6Pieces: [Stone]
+    /// The player's hand in PvC is always their active deck. Opponents have decks per level.
+    private let playerDeck: Deck
 
-    private var player1PiecesForEachDifficulty: [[Stone]]
+    // Hands built once per game setup and refilled on reset, so a reset deals the same
+    // stones (same ids) again.
+    private var pvcPlayerHand: [Stone] = []
+    private var pvcComputerHand: [Stone] = []
 
     private let persistence: PersistenceStore
     private let analytics: AnalyticsService
@@ -78,26 +76,22 @@ class GameViewModel: ObservableObject {
     private let pvpPlayer1Hand: [Stone]
     private let pvpPlayer2Hand: [Stone]
 
-    init(persistence: PersistenceStore = UserDefaultsPersistenceStore(), analytics: AnalyticsService = ConsoleAnalyticsService()) {
-        let piecesModel = PlayerPiecesModel()
-        self.gameState = GameState(player1Hand: piecesModel.player1Pieces, player2Hand: piecesModel.player2Pieces, startingPlayer: startingPlayer)
-        self.level1Pieces = piecesModel.level1Pieces
-        self.level2Pieces = piecesModel.level2Pieces
-        self.level3Pieces = piecesModel.level3Pieces
-        self.level4Pieces = piecesModel.level4Pieces
-        self.level5Pieces = piecesModel.level5Pieces
-        self.level6Pieces = piecesModel.level6Pieces
-        self.player1PiecesForEachDifficulty = piecesModel.player1PiecesForEachDifficulty
+    init(persistence: PersistenceStore = UserDefaultsPersistenceStore(), analytics: AnalyticsService = ConsoleAnalyticsService(), playerDeck: Deck = .starter) {
+        let standardHand1 = Deck.standard.stones(owner: 1)
+        let standardHand2 = Deck.standard.stones(owner: 2)
+        self.gameState = GameState(player1Hand: standardHand1, player2Hand: standardHand2, startingPlayer: startingPlayer)
         self.persistence = persistence
         self.analytics = analytics
-        self.pvpPlayer1Hand = piecesModel.player1Pieces
-        self.pvpPlayer2Hand = piecesModel.player2Pieces
+        self.playerDeck = playerDeck
+        self.pvpPlayer1Hand = standardHand1
+        self.pvpPlayer2Hand = standardHand2
     }
     
     var selectedDifficulty: Int = 1
     
     /// The most elemental squares a new game may get. 0 keeps boards plain, so unit
-    /// tests stay deterministic; the game screens set it to 2.
+    /// tests stay deterministic; the game screens set it to 2. Stones carry their tile's
+    /// element either way; only the squares depend on this.
     var maxElementalSquares = 0
     
     /// A random layout of 1 to `maxElementalSquares` squares, or all plain when the max is 0.
@@ -108,32 +102,13 @@ class GameViewModel: ObservableObject {
         return BoardGenerator.elementalSquares(count: count, using: &generator)
     }
     
-    /// Placeholder elements on a hand, only when squares are on.
-    private func withElements(_ hand: [Stone]) -> [Stone] {
-        maxElementalSquares > 0 ? PlaceholderElements.assign(to: hand) : hand
-    }
-    
-    /// Difficulty is always 1-6 in practice (the picker that drives it only offers
-    /// those values), but Int isn't exhaustively switchable, so `default` falls
-    /// back to level 1 rather than being duplicated across every caller.
-    private func pieces(forDifficulty level: Int) -> (computer: [Stone], player1: [Stone]) {
-        switch level {
-        case 1: return (level1Pieces, player1PiecesForEachDifficulty[0])
-        case 2: return (level2Pieces, player1PiecesForEachDifficulty[1])
-        case 3: return (level3Pieces, player1PiecesForEachDifficulty[2])
-        case 4: return (level4Pieces, player1PiecesForEachDifficulty[3])
-        case 5: return (level5Pieces, player1PiecesForEachDifficulty[4])
-        case 6: return (level6Pieces, player1PiecesForEachDifficulty[5])
-        default: return (level1Pieces, player1PiecesForEachDifficulty[0])
-        }
-    }
-
     func setupComputerDifficulty(_ level: Int) {
         selectedDifficulty = level
         analytics.track(event: "game_started", properties: ["mode": "pvc", "difficulty": level])
-        let hands = pieces(forDifficulty: level)
-        player2Pieces = withElements(hands.computer)
-        player1Pieces = withElements(hands.player1)
+        pvcPlayerHand = playerDeck.stones(owner: 1)
+        pvcComputerHand = OpponentDecks.deck(forLevel: level).stones(owner: 2)
+        player1Pieces = pvcPlayerHand
+        player2Pieces = pvcComputerHand
         gameState.cellElements = newSquares()
         isPlayingComputer = true
         requestComputerMoveIfDue()
@@ -195,18 +170,10 @@ class GameViewModel: ObservableObject {
     }
     
     func resetGame() {
-        let player1Hand: [Stone]
-        let player2Hand: [Stone]
-        if isPlayingComputer {
-            let hands = pieces(forDifficulty: selectedDifficulty)
-            player1Hand = hands.player1
-            player2Hand = hands.computer
-        } else {
-            // PvP never sets a difficulty, so refill with the hands the game started with.
-            player1Hand = pvpPlayer1Hand
-            player2Hand = pvpPlayer2Hand
-        }
-        gameState = GameState(player1Hand: withElements(player1Hand), player2Hand: withElements(player2Hand), startingPlayer: startingPlayer)
+        // PvP never sets a difficulty, so it refills with the hands it started with.
+        let player1Hand = isPlayingComputer ? pvcPlayerHand : pvpPlayer1Hand
+        let player2Hand = isPlayingComputer ? pvcComputerHand : pvpPlayer2Hand
+        gameState = GameState(player1Hand: player1Hand, player2Hand: player2Hand, startingPlayer: startingPlayer)
         gameState.cellElements = newSquares()
         isGameOver = false
         winner = nil

@@ -211,15 +211,15 @@ final class GameViewModelTests: XCTestCase {
         let viewModel = makePVCViewModel()
 
         XCTAssertEqual(squareCount(viewModel), 0)
-        XCTAssertTrue((viewModel.player1Pieces + viewModel.player2Pieces).allSatisfy { $0.element == nil })
 
         viewModel.resetGame()
 
         XCTAssertEqual(squareCount(viewModel), 0)
-        XCTAssertTrue((viewModel.player1Pieces + viewModel.player2Pieces).allSatisfy { $0.element == nil })
+        // Stones carry their tile's element whatever the board, so the hands are not plain.
+        XCTAssertEqual(viewModel.player1Pieces.map(\.element), Deck.starter.tiles.map(\.element))
     }
 
-    func testPvcSetup_withSquaresOn_scattersSquaresAndElementsTheHands() {
+    func testPvcSetup_withSquaresOn_scattersSquaresAndDealsTheDecks() {
         let viewModel = GameViewModel(persistence: InMemoryPersistenceStore(), analytics: SpyAnalyticsService())
         viewModel.maxElementalSquares = 2
 
@@ -227,8 +227,21 @@ final class GameViewModelTests: XCTestCase {
 
         XCTAssertTrue((1...2).contains(squareCount(viewModel)))
         XCTAssertTrue(viewModel.gameState.blocks.isEmpty)
-        XCTAssertEqual(viewModel.player1Pieces.map(\.element), [.fire, .water, .earth, .air, nil])
-        XCTAssertEqual(viewModel.player2Pieces.map(\.element), [.fire, .water, .earth, .air, nil])
+        XCTAssertEqual(viewModel.player1Pieces.map(\.tileID), Deck.starter.tileIDs)
+        XCTAssertEqual(viewModel.player2Pieces.map(\.tileID), OpponentDecks.deck(forLevel: 3).tileIDs)
+        XCTAssertEqual(viewModel.player2Pieces.map(\.element), OpponentDecks.deck(forLevel: 3).tiles.map(\.element))
+    }
+
+    func testPvcHands_comeFromTheInjectedPlayerDeckAndTheLevelsOpponentDeck() {
+        let custom = Deck(tileIDs: ["common-fire-2", "common-water-2", "common-earth-2", "common-air-2", "common-air-1"])
+        let viewModel = GameViewModel(persistence: InMemoryPersistenceStore(), analytics: SpyAnalyticsService(), playerDeck: custom)
+
+        viewModel.setupComputerDifficulty(5)
+
+        XCTAssertEqual(viewModel.player1Pieces.map(\.tileID), custom.tileIDs)
+        XCTAssertTrue(viewModel.player1Pieces.allSatisfy { $0.owner == 1 })
+        XCTAssertEqual(viewModel.player2Pieces.map(\.tileID), OpponentDecks.deck(forLevel: 5).tileIDs)
+        XCTAssertTrue(viewModel.player2Pieces.allSatisfy { $0.owner == 2 })
     }
 
     func testResetGame_withSquaresOn_makesANewLayoutOfOneOrTwoSquaresEachTime() {
@@ -259,8 +272,8 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertTrue((1...2).contains(squareCount(viewModel)))
         XCTAssertEqual(viewModel.player1Pieces.map(\.id), startingIDs1)
         XCTAssertEqual(viewModel.player2Pieces.map(\.id), startingIDs2)
-        XCTAssertEqual(viewModel.player1Pieces.map(\.element), [.fire, .water, .earth, .air, nil])
-        XCTAssertEqual(viewModel.player2Pieces.map(\.element), [.fire, .water, .earth, .air, nil])
+        XCTAssertEqual(viewModel.player1Pieces.map(\.tileID), Deck.standard.tileIDs)
+        XCTAssertEqual(viewModel.player2Pieces.map(\.tileID), Deck.standard.tileIDs, "both PvP players use the standard deck")
     }
 
     func testFullPvcGames_withSquaresOn_alwaysFillTheBoardWithStonesAndBlocks() {
