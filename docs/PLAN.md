@@ -200,20 +200,22 @@ Letting the player choose tiles from a collection turns each opponent from a rep
 
 Done when a player can build a deck, enter a match with it and see the opponent use tiles from the same pool.
 
-Decisions for this phase (journey design v2, which replaces the earlier 36-tile design; the tile count is a proposal until the owner confirms it):
+Decisions for this phase (journey design v2, answered by the owner on November 6, 2026; it replaces the earlier 36-tile design):
 
-- 52 tiles in 5 tiers: basic 10, common 12, uncommon 12, rare 10, epic 8. Most tiles are elementless: 32 plain and 20 elemental (one per element in every tier). The launch range is 48 to 60. Each tile can be owned once; the collection is a set of tile ids, and rewards and the shop never offer an owned tile
+- Confirmed: 52 tiles in 5 tiers: basic 10, common 12, uncommon 12, rare 10, epic 8. Most tiles are elementless: 32 plain and 20 elemental (one per element in every tier). The launch range is 48 to 60. Each tile can be owned once; the collection is a set of tile ids, and rewards and the shop never offer an owned tile
 - Edges run 1 to 9 with a spread cap of 6. Elemental tiles have a fixed edge sum per tier: 9, 12, 16, 20 and 24 (the four existing sums plus a new basic tier below common). A plain tile gets 1 more (10, 13, 17, 21, 25), because it breaks on every elemental square. Distinct edge sets per sum are enough for every tier (sum 9 has 6 for 4 elemental basic tiles; sum 10 has 9 for 6 plain ones)
 - The element-aware dominance rule still holds by construction. A plain tile (sum S+1) can never be dominated by an elemental tile (sum S), because it is higher on at least one edge. A plain tile never dominates an elemental one, because it breaks where the other survives. Two plain tiles in a tier share one sum, so neither dominates. The `+1` compensation therefore does not depend on how many tiles are plain. What changes is feel: on a clean board an elemental tile is simply 1 point weaker, so elements are a bet on later boards
-- Every tile has a source: `starter` (the 4 plain basic tiles the player begins with), `campaign` (dropped by NPC nodes) or `shop` (bought with gold, never dropped). Proposed shop-exclusive set: the 4 rare and 4 epic elemental tiles (8 of 52). Everything else is campaign. A test checks that every campaign tile is in some node's reward order and no shop tile is
+- Every tile has a source: `starter` (the 4 plain basic tiles the player begins with), `campaign` (dropped by NPC nodes, including the tutorial's tile) or `shop` (bought with gold, never dropped). The shop-exclusive set is the 4 rare and 4 epic elemental tiles (8 of 52), and the shop's stock unlocks by chapter. Everything else is campaign. A test checks that every campaign tile is in some node's reward order and that no shop tile is in any node's reward order
+- The 4 starter tiles are plain basic tiles with four different edge profiles, for example a one-sided vanguard (one high edge), a two-sided flanker (two high edges) and a defensive anchor (even edges). The tutorial reward is a fifth plain basic tile with yet another profile. These five are hand-specified in the generator, not random picks, and the exact edges are reported in PR 4. A test checks that the five profiles differ: no two share a sorted edge set (a rotation of a tile counts as the same profile) and they do not all share one shape. Plain basic tiles have a sum of 10, which allows 9 distinct edge sets; the sixth plain basic tile is a campaign tile
+- Free play and PvP are separate from the campaign. PvP uses a clean board and a standard deck of 5 plain commons for both players. On a clean board an elemental tile is weaker and its element does nothing, so the standard deck has none. Revisit when a board picker exists
 - Decks are 1 to 5 tiles. Only a full deck of 5 is allowed in free play and the deck builder; the tutorial hand is 4 tiles. Hands stay visible and never draw from a larger deck, so exact AI search stays possible
-- Opponent decks are explicit tile-id lists, per campaign node and, for free play, per level (the deck of a representative node for that stage). The "every opponent deck covers 3 of 4 elements" rule is dropped because most tiles are elementless. In its place: decks used on boards with elemental squares hold at least 2 elemental tiles, every id in every deck resolves, and deck edge totals follow the tier sums
+- Opponent decks are explicit tile-id lists, per campaign node and, for free play, per level by reference: each level names a representative node by id and uses that node's deck, so no deck exists twice. Until the campaign nodes exist (PR 10), the free-play decks stay as explicit per-level lists. The "every opponent deck covers 3 of 4 elements" rule is dropped because most tiles are elementless. In its place: decks used on boards with elemental squares hold at least 2 elemental tiles, every id in every deck resolves, and deck edge totals follow the tier sums
 - The tile set is regenerated, so every tile's edges change even where an id looks the same. A fingerprint test pins the shipped edges, so a later regeneration cannot pass CI until the owner has approved it and the winnability check has been rerun
 - `scripts/generate_tiles.py` (fixed seed) writes `Models/TileSet.swift`; rerun it and the TileSetTests after any budget change
 
 Order of work: the PR sequence under "Journey design" in Phase 5 sets the order. It builds a thin vertical slice first (tile set, board specs, reward rules, profile and saving, a basic deck builder, the tutorial, a short map, a basic shop) and polishes the collection grid, multiple decks and the coin flip afterwards. A short plan comes first for each screen.
 
-Status: the `Tile` model and rarity budget are merged (#8), and hands come from decks (#10, 108 tests). The owner has refined the journey design (v2, below). Next is PR 4, the tile set retune, which starts with the owner's approval of this plan.
+Status: the `Tile` model and rarity budget are merged (#8), and hands come from decks (#10, 108 tests). The owner has refined the journey design (v2, below). Next is PR 4, the tile set retune, which starts once the owner says the plan (PR #11) is merged.
 
 ## Phase 5: Campaign map, NPC progression, rewards and shop
 
@@ -221,7 +223,8 @@ Progression gives the player a reason to come back: each win against an NPC drop
 
 - [ ] NPC roster: name, deck, AI level (reuse levels 1 to 6), board spec and a reward order that starts with a signature tile
 - [ ] Reward rule: a win drops the first tile in the reward order that the player does not own; when none is left, it pays gold. A loss or a tie grants nothing and the player retries
-- [ ] Shop: buy shop-source tiles with gold at fixed prices by rarity
+- [ ] Shop: buy shop-source tiles with gold at fixed prices by rarity; stock unlocks by chapter
+- [ ] Economy table: gold per replay, shop prices and which chapter unlocks which stock, all in one file with tests
 - [ ] Persistence: save collection, decks, gold, cleared nodes and unlock flags locally (`Codable` to a file, or SwiftData)
 - [ ] Campaign map screen that shows which NPCs are beaten and which are next (see the design below)
 - [ ] Pick a business model: paid app or one-time unlock; if you ever add randomized packs, Apple requires odds disclosure
@@ -234,15 +237,15 @@ The game is a journey. The player grows a collection and a deck from a small sta
 
 Start and tutorial:
 
-- The player begins with 4 plain basic tiles and a tutorial match. Beating it grants the 5th tile and completes the 5-tile deck. The deck builder unlocks after that, and free play stays locked until the deck is complete
+- The player begins with 4 plain basic tiles with four different edge profiles and a tutorial match. Beating it grants a fifth plain basic tile with another profile and completes the 5-tile deck. The deck builder unlocks after that, and free play stays locked until the deck is complete
 - The tutorial works with a 4-tile hand because the computer moves first on a clean 9-cell board: the computer plays 5 stones and the human plays 4. The tutorial's starting player is fixed. The tutorial grants its tile through the same reward rule as every other node (its reward order holds the 5th tile)
-- The tutorial opponent holds a fixed hand and plays level 1. If the tile set cannot make a forced win possible, the tutorial opponent may use dedicated stones that are not collectible tiles. The tutorial is checked by exhaustive search for a forced win
+- The tutorial opponent holds a fixed hand of dedicated scripted tiles that are not in the catalog, and plays level 1. A test must prove a forced win for the human with the exact search (the human wins against every computer reply, computer first). If the starter tiles cannot force a win, the fix is to weaken the opponent's scripted tiles, never to add tiles to the player's hand
 
 Map and rewards:
 
-- A single-player map of NPC nodes, in the style of mobile campaign maps (original art and names). Each NPC has a deck. Each win drops one tile from that NPC's deck that the player does not own, in a fixed order that starts with a signature tile. Once every tile in the NPC's reward order is owned, a win pays gold instead. A first win unlocks the next node
+- A single-player map of NPC nodes, in the style of mobile campaign maps (original art and names). Each NPC has a deck. Each win drops one tile from that NPC's deck that the player does not own, in a fixed order that starts with a signature tile. Once every tile in the NPC's reward order is owned, a win pays gold instead. Only a first win unlocks the next node; a replay never changes what is unlocked
 - A node's reward order lists campaign tiles only, so a boss may play a shop-exclusive tile without ever dropping it
-- Gold buys shop-exclusive tiles at fixed prices by rarity. Higher-rarity stock unlocks chapter by chapter. The campaign never requires buying: the winnability check assumes no shop purchases
+- Gold buys shop-exclusive tiles at fixed prices by rarity. Stock unlocks chapter by chapter (the table in the Economy bullet below says which). The campaign never requires buying: the winnability check assumes no shop purchases
 - Skip and auto-win items are out of scope for v1
 
 Boards and elements:
@@ -250,26 +253,27 @@ Boards and elements:
 - Most tiles are elementless. An elementless or mismatched stone breaks into a block on an elemental square, so elements matter only on late boards
 - Boards by stage: early nodes use clean 3x3 boards; middle nodes pre-place 1 to 3 blocked cells; late nodes combine blocks and elemental squares. Each node carries its own `BoardSpec` (blocked cells and elemental squares, fixed per node)
 - Free play maps AI level to the same stages with randomly generated specs: levels 1 and 2 clean, 3 and 4 blocks, 5 and 6 blocks plus elemental squares
-- Scripted teaching nodes at the first block board and the first elemental-square board keep the early game guided (after the first slice)
+- The first slice shows a one-sentence hint the first time blocks or elemental squares appear (the seen flags live in the profile; the hint ships with the tutorial and result screens in PR 9). Full scripted teaching nodes for blocks and squares come later (PR 15)
 
 Power scale and PvP:
 
 - Starter and early-opponent tiles are low-power (basic), rising through the tiers to high-stat boss tiles (rare and epic)
-- PvP is local only and reward-free: both players use the standard deck. Rewards for online PvP wait until online PvP exists. The PvP board and the standard deck are an open decision (see the last section)
-- Free play (any AI level, with the active deck) stays available after the tutorial and pays nothing
+- PvP is local only and reward-free: both players use the standard deck. Rewards for online PvP wait until online PvP exists. PvP uses a clean board and a standard deck of 5 plain commons
+- Free play (any AI level, with the active deck) stays available once the player has a full deck and pays nothing. Gold and tiles come only from campaign nodes
 
 Data model (pure, in `Models/` and `Engine/`):
 
 - `BoardSpec`: `blocks: Set<Int>` and `cellElements: [Element?]` (9 entries). Validation: cells in range, no block on an elemental square, block count within the stage's limit. `BoardSpec.clean` is the empty spec; `BoardSpec.random(stage:using:)` builds free-play boards through `BoardGenerator`. `GameState` already holds `blocks` and `cellElements`, so it needs no new fields: the spec is applied once at game start, and the view model's `maxElementalSquares` is replaced by a `BoardSpec`
 - `MatchSetup`: the player's hand (1 to 5 tiles), the opponent's deck or fixed hand, AI level, `BoardSpec` and starting player. It validates that each side has enough stones for the turns it will take: with `n` empty cells the first mover takes `ceil(n/2)` turns and the second `floor(n/2)`. A player with an empty hand and cells left has no legal move and the game would stall, so this check is a test, not a hope
-- `CampaignNode`: id, name, map position, `MatchSetup` data (deck, AI level, `BoardSpec`, starting player), `rewardOrder: [String]`, gold for a repeat win, and prerequisite node ids. Free play does not use nodes
+- `CampaignNode`: id, name, map position, `MatchSetup` data (deck, AI level, `BoardSpec`, starting player), `rewardOrder: [String]` and prerequisite node ids. Repeat-win gold is not stored on the node; it comes from the economy table. Free play does not use nodes, except that each AI level names a representative node whose deck it borrows
 - `RewardRules.reward(for outcome, rewardOrder, owned, catalog, gold) -> Reward` where `Reward` is `none`, `tile(id)` or `gold(amount)`. A loss or a tie gives `none`. A win gives the first id in the order that exists in the catalog, is not shop-source and is not owned, else gold. The tests cover: signature first; owned tiles skipped; shop tiles skipped; draining a deck in order, then gold; gold is above zero; an empty or unknown order pays gold; the function is deterministic; and the result never names an owned tile. The caller records a result once per match, so a result screen that redraws cannot pay twice
+- `Economy` (one file, `Models/Economy.swift`): every tunable economy number in one table, so tuning is one file. It holds gold per replay for each campaign node, the shop price for each rarity, and the chapter that unlocks each shop tile. Tests: every campaign node has replay gold above zero; every shop tile has a price and an unlock chapter that exists; prices rise with rarity; no non-shop tile is priced; and each chapter's stock is affordable from the replay gold of earlier chapters within a stated number of replays. Winnability thresholds are test constants in one place, not part of this table
 
 Winnability check:
 
 - Collections at a node: the floor is the starter tiles, the tutorial tile and the signature tile of each earlier node. The ceiling is the starter tiles plus every campaign tile of earlier nodes, as if the player had farmed. Neither includes shop tiles
-- Normal nodes: a reference player with the best deck from the collection must win at least 50% of seeded games from the floor and at least 70% from the ceiling (starting values, to be tuned) against that node's actual AI and board spec, computer moving first. A forced win against a perfect opponent is not required of a fair node
-- Tutorial: a forced win for the player, by exhaustive search
+- Normal nodes: a reference player with the best deck from the collection must win at least 50% of seeded games from the floor and at least 70% from the ceiling (starting values, to be tuned; a node may override them, as boss nodes will) against that node's actual AI and board spec, computer moving first. The actual rate for every node, floor and ceiling, is printed by the test and reported in the PR description. A forced win against a perfect opponent is not required of a fair node
+- Tutorial: a forced win for the human, proven by exhaustive search in a test (see the tutorial notes above)
 - Ladder test: with a fixed deck, win rate does not rise by more than the tolerance as the level rises
 - A replay of a cleared node always pays gold above zero, and every campaign tile is reachable from some node's reward order
 - Cost: report the runtime of the exact search and the 300-game checks before wiring them into CI. Keep per-PR CI fast: a small seeded smoke subset runs in the normal suite, and the full run is a separate command or scheduled job
@@ -280,15 +284,15 @@ PR sequence for Phases 4 and 5, a thin vertical slice first. Each PR leaves the 
 1. Merged: `Tile`, rarity budget and generated tile set (#8)
 2. Merged: hands come from decks (#10): the player's hand is the active deck, fixed opponent decks per level from the pool, a standard PvP deck and a difficulty-ladder test. Removed `PlayerPiecesModel` and `PlaceholderElements`
 3. (Merged with step 2; the deck builder moved to step 8)
-4. Tile set v2: basic tier, 52 tiles (mostly elementless), a source per tile, regenerated set, fingerprint test. Starter tiles, the standard deck and the free-play opponent decks are rewritten, the "3 elements" rule is replaced, and the ladder is re-measured and reported before and after. Everything is still owned in memory
+4. Tile set v2: basic tier, 52 tiles (mostly elementless), a source per tile, regenerated set, fingerprint test, and the five starter profiles with their distinctness test. Starter tiles, the standard deck (5 plain commons) and the free-play opponent decks are rewritten, the "3 elements" rule is replaced, and the ladder is re-measured and reported before and after. Everything is still owned in memory
 5. `BoardSpec`, stages and `MatchSetup` validation: the view model applies a `BoardSpec` at game start, free-play levels map to stages (clean, blocks, blocks plus squares), and the hand-length check lands. This visibly changes levels 1 to 4 (no squares on 1 and 2, blocks on 3 and 4), so it carries manual checks
-6. Reward rule and campaign node data: pure and fully tested, no screens
+6. Reward rule, campaign node types and the `Economy` table: pure and fully tested, no screens
 7. Player profile and saving: owned tile ids, active deck (4 or 5 tiles), gold, cleared nodes and unlock flags in one `Codable` value behind `PersistenceStore`
 8. Basic deck builder: pick 5 tiles from the owned collection, backed by the profile. A short plan comes first
-9. Scripted tutorial match and the result screen: the 4-tile hand, fixed opponent hand, forced-win check (with its runtime reported), Play again and Back to map. Fixes the dead end after a PvC game
-10. Short campaign data (the tutorial plus about five nodes) and the winnability harness, as tests only: floor and ceiling collections, smoke subset in CI, full run separate. Nothing user-visible, so the economy is checked before any player meets it
+9. Scripted tutorial match and the result screen: the 4-tile hand, a fixed hand of scripted opponent tiles, the exact-search proof of a forced human win (runtime reported), the first-time hint for blocks and squares, Play again and Back to map. Fixes the dead end after a PvC game
+10. Short campaign data (the tutorial plus six nodes, one per AI level; free-play levels switch to borrowing these nodes' decks by id) and the winnability harness, as tests only: floor and ceiling collections, per-node overrides, per-node rates reported, smoke subset in CI, full run separate. Nothing user-visible, so the economy is checked before any player meets it
 11. Map screen, rewards and gold, progression gating (deck builder unlocks after the tutorial, free play after a full deck). This PR switches the starting collection from everything owned to the starter tiles only. **This is the riskiest step**: a mistuned economy can leave a new player unable to progress, so it merges only with the step 10 check green at both the floor and the ceiling
-12. Basic shop: fixed prices by rarity, chapter-gated stock, never offers an owned or campaign tile, unlocks after a set node
+12. Basic shop: prices and chapter-gated stock read from the `Economy` table, never offers an owned or campaign tile, unlocks after a set node
 13. Collection screen: grid, filters by rarity and element, silhouettes for unowned tiles
 14. More than one saved deck
 15. Stars (rules kept in one place), chapters, boss nodes and the scripted teaching nodes for blocks and elemental squares
@@ -304,13 +308,13 @@ How it plays:
 - Each node is an NPC with a name, a deck, an AI level (reuse levels 1 to 6), a board spec and a reward order
 - Beating a node unlocks the next one, and later nodes use higher AI levels, stronger decks and harder boards
 - Each node awards 1 to 3 stars, so there is a reason to replay: 1 for a win, 2 for winning by 3 or more stones, 3 for winning by 5 or more (starting values, to be tuned). Stars arrive in step 15 and are not part of the first slice
-- Each win drops the next unowned tile in the node's reward order; once the order is exhausted, wins pay gold, with a bonus later for beating your best star count
+- Each win drops the next unowned tile in the node's reward order; once the order is exhausted, wins pay the node's replay gold from the economy table, with a bonus later for beating your best star count
 - Nodes are grouped into chapters of 5 to 8, themed by rune or element, and each chapter ends in a boss with a stronger deck
 - Every match ends on a result screen with Play again and Back to map, which also fixes the current dead end after a PvC game
 
 What to build:
 
-- [ ] Define campaign node data: id, name, map position, deck, AI level, `BoardSpec`, starting player, reward order, repeat-win gold, prerequisite node ids
+- [ ] Define campaign node data: id, name, map position, deck, AI level, `BoardSpec`, starting player, reward order, prerequisite node ids (repeat-win gold lives in the economy table)
 - [ ] Map screen: a scrolling path where each node shows locked, available or beaten, plus its stars
 - [ ] Result screen: win, loss or tie, rewards (a tile or gold), then Play again or Back to map
 - [ ] Keep the star rules in one place so the Phase 6 simulation can tune them
@@ -379,9 +383,9 @@ Twelve decisions shape the rules and scope; each has a default so work does not 
 | Hands | Visible to both sides, or hidden | Visible for v1, which makes exact AI search possible |
 | Business model | Paid, one-time unlock, free | Paid or one-time unlock; no random packs |
 | Online PvP | Game Center turn-based, or skip | Skip until after v1 |
-| Tile count at launch | Full 80, or fewer | Proposed: 52 (basic 10, common 12, uncommon 12, rare 10, epic 8), 32 plain and 20 elemental; owner to confirm within 48 to 60 |
-| PvP board and standard deck | Clean board or random stage; a 5-tile deck of plain commons or one with elemental tiles | Open: proposed clean board and a standard deck of 3 plain and 2 elemental commons |
-| Free play rewards | Pays nothing, or pays gold | Pays nothing, so the campaign stays the only source of progress |
+| Tile count at launch | Full 80, or fewer | Decided: 52 (basic 10, common 12, uncommon 12, rare 10, epic 8), 32 plain and 20 elemental |
+| PvP board and standard deck | Clean board or random stage; plain or elemental commons | Decided: clean board, 5 plain commons for both players; revisit when a board picker exists |
+| Free play rewards | Pays nothing, or pays gold | Decided: pays nothing; replay gold is paid on campaign nodes only |
 | Campaign star rules | Win only, margin-based, or no stones lost | Margin-based (win, win by 3, win by 5), tuned in the Phase 6 simulation |
 | Free play after the campaign | Keep a quick-match mode with any AI level, or campaign only | Keep it; the AI levels already exist, so it costs almost nothing |
 
